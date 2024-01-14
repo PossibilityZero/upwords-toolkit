@@ -5,11 +5,11 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "jest",
+    "test": "jest --verbose --coverage",
     "build": "tsc",
     "lint": "eslint . --ext .ts",
-    "prettier-format": "prettier --config .prettierrc 'src/**/*' 'test/**/*' --write",
-    "prettier-check": "prettier --config .prettierrc 'src/**/*' 'test/**/*' --check",
+    "prettier-format": "prettier --config .prettierrc 'src/**/*' --write",
+    "prettier-check": "prettier --config .prettierrc 'src/**/*' --check",
     "prepare": "husky install"
   },
   "repository": {
