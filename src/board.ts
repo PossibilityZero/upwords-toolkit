@@ -14,6 +14,68 @@ enum PlayDirection {
   Vertical
 }
 
+class UBFHelper {
+  /* No public method in the class mutates the board.
+   * Instead, a new copy is created for each operation.
+   */
+  static copyBoard(board: IUpwordsBoardFormat): IUpwordsBoardFormat {
+    // Tiles are strings and are immutable, so this is a deep copy
+    return board.map((row) => row.map((tile) => tile));
+  }
+
+  static placeSingleTile(
+    board: IUpwordsBoardFormat,
+    letter: string,
+    coordinate: Coord
+  ): IUpwordsBoardFormat {
+    const newBoard = UBFHelper.copyBoard(board);
+    const [x, y] = coordinate;
+    const [currentHeight, currentLetter] = newBoard[x]![y]!.split('');
+    if (letter === ' ') {
+      newBoard[x]![y] = `${currentHeight}${currentLetter}`;
+    } else {
+      const newHeight = (parseInt(currentHeight!) + 1).toString();
+      newBoard[x]![y] = `${newHeight}${letter}`;
+    }
+    return newBoard;
+  }
+
+  static #placeTileMutate(board: IUpwordsBoardFormat, letter: string, coordinate: Coord): void {
+    const [x, y] = coordinate;
+    const [currentHeight, currentLetter] = board[x]![y]!.split('');
+    if (letter === ' ') {
+      board[x]![y] = `${currentHeight}${currentLetter}`;
+    } else {
+      const newHeight = (parseInt(currentHeight!) + 1).toString();
+      board[x]![y] = `${newHeight}${letter}`;
+    }
+  }
+
+  static placeTiles(
+    board: IUpwordsBoardFormat,
+    tiles: string,
+    start: Coord,
+    direction: PlayDirection
+  ): IUpwordsBoardFormat {
+    const newBoard = UBFHelper.copyBoard(board);
+    const [startX, startY] = start;
+    if (direction === PlayDirection.Horizontal) {
+      let i = 0;
+      for (const letter of tiles) {
+        UBFHelper.#placeTileMutate(newBoard, letter, [startX, startY + i]);
+        i++;
+      }
+    } else if (direction === PlayDirection.Vertical) {
+      let i = 0;
+      for (const letter of tiles) {
+        UBFHelper.#placeTileMutate(newBoard, letter, [startX + i, startY]);
+        i++;
+      }
+    }
+    return newBoard;
+  }
+}
+
 class UpwordsBoard {
   private tiles: IUpwordsBoardFormat;
   private moveHistory: IMoveResult[];
@@ -42,18 +104,6 @@ class UpwordsBoard {
     return this.tiles;
   }
 
-  private placeTile(letter: string, coordinate: Coord): boolean {
-    const [x, y] = coordinate;
-    const [currentHeight, currentLetter] = this.tiles[x]![y]!.split('');
-    if (letter === ' ') {
-      this.tiles[x]![y] = `${currentHeight}${currentLetter}`;
-    } else {
-      const newHeight = (parseInt(currentHeight!) + 1).toString();
-      this.tiles[x]![y] = `${newHeight}${letter}`;
-    }
-    return true;
-  }
-
   private checkInBounds(tiles: string, start: Coord, direction: PlayDirection): boolean {
     const length = tiles.trimEnd().length;
     if (start[0] < 0 || start[1] < 0) {
@@ -67,42 +117,8 @@ class UpwordsBoard {
     }
   }
 
-  #dryRunPlaceTile(board: IUpwordsBoardFormat, letter: string, coordinate: Coord): boolean {
-    const [x, y] = coordinate;
-    const [currentHeight, currentLetter] = this.tiles[x]![y]!.split('');
-    if (letter === ' ') {
-      board[x]![y] = `${currentHeight}${currentLetter}`;
-    } else {
-      const newHeight = (parseInt(currentHeight!) + 1).toString();
-      board[x]![y] = `${newHeight}${letter}`;
-    }
-    return true;
-  }
-
-  #dryRunPlayTiles(
-    board: IUpwordsBoardFormat,
-    tiles: string,
-    start: Coord,
-    direction: PlayDirection
-  ): IUpwordsBoardFormat {
-    const [startX, startY] = start;
-    if (direction === PlayDirection.Horizontal) {
-      let i = 0;
-      for (const letter of tiles) {
-        this.#dryRunPlaceTile(board, letter, [startX, startY + i]);
-        i++;
-      }
-    } else if (direction === PlayDirection.Vertical) {
-      let i = 0;
-      for (const letter of tiles) {
-        this.#dryRunPlaceTile(board, letter, [startX + i, startY]);
-        i++;
-      }
-    }
-    return board;
-  }
-
   playTiles(tiles: string, start: Coord, direction: PlayDirection): IMoveResult {
+    // Pre-placement validations
     const inBounds = this.checkInBounds(tiles, start, direction);
     if (!inBounds) {
       return {
@@ -110,30 +126,16 @@ class UpwordsBoard {
         error: MoveErrorCode.OutOfBounds
       };
     }
-    const testBoard = this.tiles.map((row) => row.map((tile) => tile));
-    this.#dryRunPlayTiles(testBoard, tiles, start, direction);
-    // check if any tiles are above height 5
-    const heightLimitExceeded = testBoard.some((row) => row.some((tile) => tile[0]! > '5'));
+    // Post-placement validations
+    const newBoardState = UBFHelper.placeTiles(this.tiles, tiles, start, direction);
+    const heightLimitExceeded = newBoardState.some((row) => row.some((tile) => tile[0]! > '5'));
     if (heightLimitExceeded) {
       return {
         isValid: false,
         error: MoveErrorCode.HeightLimitExceeded
       };
-    }
-
-    const [startX, startY] = start;
-    if (direction === PlayDirection.Horizontal) {
-      let i = 0;
-      for (const letter of tiles) {
-        this.placeTile(letter, [startX, startY + i]);
-        i++;
-      }
-    } else if (direction === PlayDirection.Vertical) {
-      let i = 0;
-      for (const letter of tiles) {
-        this.placeTile(letter, [startX + i, startY]);
-        i++;
-      }
+    } else {
+      this.tiles = newBoardState;
     }
     const moveResult = {
       points: 10,
