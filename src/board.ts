@@ -96,10 +96,28 @@ class UBFHelper {
 }
 
 class IllegalPlay {
-  static playTouchesExistingTile(board: IUpwordsBoardFormat, play: IUpwordsPlay): boolean {
+  static playOutOfBounds(play: IUpwordsPlay): boolean {
+    const { tiles, start, direction } = play;
+    const length = tiles.trimEnd().length;
+    if (start[0] < 0 || start[1] < 0) {
+      return true;
+    } else if (direction === PlayDirection.Vertical && start[0] + length - 1 > 9) {
+      return true;
+    } else if (direction === PlayDirection.Horizontal && start[1] + length - 1 > 9) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  static playIsIsolated(board: IUpwordsBoardFormat, play: IUpwordsPlay): boolean {
     function coordIsInBounds(coord: Coord): boolean {
       const [x, y] = coord;
       return x >= 0 && x <= 9 && y >= 0 && y <= 9;
+    }
+    if (board.every((row) => row.every((cell) => cell === '0 '))) {
+      // Don't check for isolation if the board is empty
+      return false;
     }
     const { tiles, start, direction } = play;
     const [startX, startY] = start;
@@ -131,7 +149,7 @@ class IllegalPlay {
       const cell = board[x]![y]!;
       return cell !== '0 ';
     });
-    return touchesExistingTile;
+    return !touchesExistingTile;
   }
 
   static sameTileStacked(board: IUpwordsBoardFormat, play: IUpwordsPlay): boolean {
@@ -200,32 +218,18 @@ class UpwordsBoard {
     return UBFHelper.copyBoard(this.ubfBoard);
   }
 
-  private checkInBounds(tiles: string, start: Coord, direction: PlayDirection): boolean {
-    const length = tiles.trimEnd().length;
-    if (start[0] < 0 || start[1] < 0) {
-      return false;
-    } else if (direction === PlayDirection.Vertical && start[0] + length - 1 > 9) {
-      return false;
-    } else if (direction === PlayDirection.Horizontal && start[1] + length - 1 > 9) {
-      return false;
-    } else {
-      return true;
-    }
-  }
-
   playTiles(play: IUpwordsPlay): IMoveResult {
-    // Pre-placement validations
-    const { tiles, start, direction } = play;
-    const inBounds = this.checkInBounds(tiles, start, direction);
-    if (!inBounds) {
+    // Play validations
+    const outOfBounds = IllegalPlay.playOutOfBounds(play);
+    if (outOfBounds) {
       return {
         isValid: false,
         error: MoveErrorCode.OutOfBounds
       };
     }
-    // Post-placement validations
+    // Play and Board validations
     const heightLimitExceeded = IllegalPlay.exceedsHeightLimit(this.ubfBoard, play);
-    const touchesExistingTile = IllegalPlay.playTouchesExistingTile(this.ubfBoard, play);
+    const playIsIsolated = IllegalPlay.playIsIsolated(this.ubfBoard, play);
     const sameTileStacked = IllegalPlay.sameTileStacked(this.ubfBoard, play);
     const playHasGap = IllegalPlay.playHasGap(this.ubfBoard, play);
     if (heightLimitExceeded) {
@@ -233,7 +237,7 @@ class UpwordsBoard {
         isValid: false,
         error: MoveErrorCode.HeightLimitExceeded
       };
-    } else if (this.moveHistory.length !== 0 && !touchesExistingTile) {
+    } else if (playIsIsolated) {
       return {
         isValid: false,
         error: MoveErrorCode.NotConnected
