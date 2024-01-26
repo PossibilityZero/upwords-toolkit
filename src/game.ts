@@ -1,5 +1,4 @@
 import UpwordsBoard from './board';
-import { PlayDirection } from '../src/board';
 
 class UpwordsGame {
   players: number;
@@ -16,7 +15,6 @@ class UpwordsGame {
 
     // Cycle to the next player
     this.currentPlayer = (this.currentPlayer % this.players) + 1;
-    this.board.playTiles('HELLO', [4, 3], PlayDirection.Horizontal);
   }
 }
 
