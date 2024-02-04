@@ -13,7 +13,8 @@ enum MoveErrorCode {
   HeightLimitExceeded,
   NotConnected,
   HasGap,
-  SameTileStacked
+  SameTileStacked,
+  CoversExistingWord
 }
 type IUpwordsBoardFormat = string[][];
 type Coord = [number, number];
@@ -26,6 +27,7 @@ class UBFHelper {
   /* No public method in the class mutates the board.
    * Instead, a new copy is created for each operation.
    */
+  static boardLength = 10;
   static createEmptyBoard(): IUpwordsBoardFormat {
     return [
       ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
@@ -93,32 +95,60 @@ class UBFHelper {
     }
     return newBoard;
   }
+
+  static getLineOfPlay(
+    board: IUpwordsBoardFormat,
+    coord: Coord,
+    direction: PlayDirection
+  ): string[] {
+    const lineOfPlay = [];
+    if (direction === PlayDirection.Horizontal) {
+      const coordX = coord[0];
+      for (let i = 0; i < UBFHelper.boardLength; i++) {
+        lineOfPlay.push(board[coordX]![i]!);
+      }
+    } else if (direction === PlayDirection.Vertical) {
+      const coordY = coord[1];
+      for (let i = 0; i < UBFHelper.boardLength; i++) {
+        lineOfPlay.push(board[i]![coordY]!);
+      }
+    }
+    return lineOfPlay;
+  }
 }
 
+interface IPlayValidationResult {
+  isIllegal: boolean;
+  error: MoveErrorCode;
+}
 class IllegalPlay {
-  static playOutOfBounds(play: IUpwordsPlay): boolean {
+  static playOutOfBounds(play: IUpwordsPlay): IPlayValidationResult {
+    let isIllegal = false;
     const { tiles, start, direction } = play;
     const length = tiles.trimEnd().length;
     if (start[0] < 0 || start[1] < 0) {
-      return true;
+      isIllegal = true;
     } else if (direction === PlayDirection.Vertical && start[0] + length - 1 > 9) {
-      return true;
+      isIllegal = true;
     } else if (direction === PlayDirection.Horizontal && start[1] + length - 1 > 9) {
-      return true;
-    } else {
-      return false;
+      isIllegal = true;
     }
+    return {
+      isIllegal,
+      error: MoveErrorCode.OutOfBounds
+    };
   }
 
-  static playIsIsolated(board: IUpwordsBoardFormat, play: IUpwordsPlay): boolean {
+  static playIsIsolated(board: IUpwordsBoardFormat, play: IUpwordsPlay): IPlayValidationResult {
     function coordIsInBounds(coord: Coord): boolean {
       const [x, y] = coord;
       return x >= 0 && x <= 9 && y >= 0 && y <= 9;
     }
     if (board.every((row) => row.every((cell) => cell === '0 '))) {
       // Don't check for isolation if the board is empty
-      return false;
+      return { isIllegal: false, error: MoveErrorCode.NotConnected };
     }
+    let isIllegal = false;
     const { tiles, start, direction } = play;
     const [startX, startY] = start;
     const adjacentCoords = [];
@@ -149,31 +179,40 @@ class IllegalPlay {
       const cell = board[x]![y]!;
       return cell !== '0 ';
     });
-    return !touchesExistingTile;
+    isIllegal = !touchesExistingTile;
+    return {
+      isIllegal,
+      error: MoveErrorCode.NotConnected
+    };
   }
 
-  static sameTileStacked(board: IUpwordsBoardFormat, play: IUpwordsPlay): boolean {
+  static sameTileStacked(board: IUpwordsBoardFormat, play: IUpwordsPlay): IPlayValidationResult {
+    let isIllegal = false;
     const { tiles, start, direction } = play;
     const [startX, startY] = start;
     if (direction === PlayDirection.Horizontal) {
       for (let i = 0; i < tiles.length; i++) {
         const cell = board[startX]![startY + i]!;
         if (cell[1] === tiles[i]) {
-          return true;
+          isIllegal = true;
         }
       }
     } else if (direction === PlayDirection.Vertical) {
       for (let i = 0; i < tiles.length; i++) {
         const cell = board[startX + i]![startY]!;
         if (cell[1] === tiles[i]) {
-          return true;
+          isIllegal = true;
         }
       }
     }
-    return false;
+    return {
+      isIllegal,
+      error: MoveErrorCode.SameTileStacked
+    };
   }
 
-  static playHasGap(board: IUpwordsBoardFormat, play: IUpwordsPlay): boolean {
+  static playHasGap(board: IUpwordsBoardFormat, play: IUpwordsPlay): IPlayValidationResult {
+    let isIllegal = false;
     const { tiles, start, direction } = play;
     const boardAfterPlay = UBFHelper.placeTiles(board, play);
     const [startX, startY] = start;
@@ -181,23 +220,110 @@ class IllegalPlay {
       for (let i = 0; i < tiles.length; i++) {
         const cell = boardAfterPlay[startX]![startY + i]!;
         if (cell === '0 ') {
-          return true;
+          isIllegal = true;
         }
       }
     } else if (direction === PlayDirection.Vertical) {
       for (let i = 0; i < tiles.length; i++) {
         const cell = boardAfterPlay[startX + i]![startY]!;
         if (cell === '0 ') {
-          return true;
+          isIllegal = true;
         }
       }
     }
-    return false;
+    return {
+      isIllegal,
+      error: MoveErrorCode.HasGap
+    };
   }
 
-  static exceedsHeightLimit(board: IUpwordsBoardFormat, play: IUpwordsPlay): boolean {
+  static coversExistingWord(board: IUpwordsBoardFormat, play: IUpwordsPlay): IPlayValidationResult {
+    let isIllegal = false;
+    const { tiles, start, direction } = play;
+    const lineOfPlay = UBFHelper.getLineOfPlay(board, start, direction);
+    // We will calculate this using a mask
+    // Each "word" (contiguous sequence of minimum 2 tiles) is represented by
+    // a sequence of A/B/C/...
+    // .BE.HELLO. ->
+    // .AA.BBBBB.
+    // The play is represented by a sequence of Xs
+    // SEAS....S. ->
+    // XXXX....X.
+    // The line is masked by the play, with the larger value taking precedence
+    // .AA.BBBBB. +
+    // XXXX....X. ->
+    // XXXXBBBBX.
+    // In this example, there are no "A"s left, which means that the play
+    // covers an existing word, and is illegal
+    let wordLength = 0;
+    const maskLetters = 'ABCDEFGHIJKLMNOPQRSTUVW';
+    let currentMask = 0;
+    let lineMask = '';
+    for (let i = 0; i < lineOfPlay.length; i++) {
+      if (lineOfPlay[i] === '0 ') {
+        if (wordLength > 1) {
+          // arrived at the end of a word, increment the mask letter
+          // and reset the word length counter
+          currentMask++;
+          wordLength = 0;
+        } else if (wordLength === 1) {
+          // if it was only 1 letter, the previous character was not a word
+          // replace the previous mask letter with an empty character ('.')
+          // and reset the word length counter
+          lineMask = lineMask.slice(0, -1) + '.';
+          wordLength = 0;
+        }
+        // add a dot for an empty cell
+        lineMask += '.';
+      } else {
+        lineMask += maskLetters[currentMask];
+        wordLength++;
+      }
+    }
+    const wordMaskLetters = maskLetters.split(maskLetters[currentMask]!)[0]!;
+
+    const startCoord = direction === PlayDirection.Horizontal ? start[1] : start[0];
+    let playMask = '.'.repeat(startCoord);
+    for (let i = 0; i < tiles.length; i++) {
+      if (tiles[i] !== ' ') {
+        playMask += 'X';
+      } else {
+        playMask += '.';
+      }
+    }
+
+    playMask += '.'.repeat(lineMask.length - playMask.length);
+
+    let maskedLine = '';
+    for (let i = 0; i < lineMask.length; i++) {
+      if (playMask[i] === 'X') {
+        maskedLine += playMask[i];
+      } else {
+        maskedLine += lineMask[i];
+      }
+    }
+
+    for (const letter of wordMaskLetters) {
+      if (!maskedLine.includes(letter)) {
+        isIllegal = true;
+        break;
+      }
+    }
+
+    return {
+      isIllegal,
+      error: MoveErrorCode.CoversExistingWord
+    };
+  }
+
+  static exceedsHeightLimit(board: IUpwordsBoardFormat, play: IUpwordsPlay): IPlayValidationResult {
+    let isIllegal = false;
     const newBoardState = UBFHelper.placeTiles(board, play);
-    return newBoardState.some((row) => row.some((tile) => tile[0]! > '5'));
+    isIllegal = newBoardState.some((row) => row.some((tile) => tile[0]! > '5'));
+    return {
+      isIllegal,
+      error: MoveErrorCode.HeightLimitExceeded
+    };
   }
 }
 
@@ -220,41 +346,34 @@ class UpwordsBoard {
 
   playTiles(play: IUpwordsPlay): IMoveResult {
     // Play validations
-    const outOfBounds = IllegalPlay.playOutOfBounds(play);
-    if (outOfBounds) {
-      return {
-        isValid: false,
-        error: MoveErrorCode.OutOfBounds
-      };
+    const playValidations = [IllegalPlay.playOutOfBounds];
+    for (const validation of playValidations) {
+      const result = validation(play);
+      if (result.isIllegal) {
+        return {
+          isValid: false,
+          error: result.error
+        };
+      }
     }
     // Play and Board validations
-    const heightLimitExceeded = IllegalPlay.exceedsHeightLimit(this.ubfBoard, play);
-    const playIsIsolated = IllegalPlay.playIsIsolated(this.ubfBoard, play);
-    const sameTileStacked = IllegalPlay.sameTileStacked(this.ubfBoard, play);
-    const playHasGap = IllegalPlay.playHasGap(this.ubfBoard, play);
-    if (heightLimitExceeded) {
-      return {
-        isValid: false,
-        error: MoveErrorCode.HeightLimitExceeded
-      };
-    } else if (playIsIsolated) {
-      return {
-        isValid: false,
-        error: MoveErrorCode.NotConnected
-      };
-    } else if (playHasGap) {
-      return {
-        isValid: false,
-        error: MoveErrorCode.HasGap
-      };
-    } else if (sameTileStacked) {
-      return {
-        isValid: false,
-        error: MoveErrorCode.SameTileStacked
-      };
-    } else {
-      this.ubfBoard = UBFHelper.placeTiles(this.ubfBoard, play);
+    const boardValidations = [
+      IllegalPlay.exceedsHeightLimit,
+      IllegalPlay.playIsIsolated,
+      IllegalPlay.playHasGap,
+      IllegalPlay.sameTileStacked,
+      IllegalPlay.coversExistingWord
+    ];
+    for (const validation of boardValidations) {
+      const result = validation(this.ubfBoard, play);
+      if (result.isIllegal) {
+        return {
+          isValid: false,
+          error: result.error
+        };
+      }
     }
+    this.ubfBoard = UBFHelper.placeTiles(this.ubfBoard, play);
     const moveResult = {
       points: 10,
       isValid: true

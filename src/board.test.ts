@@ -224,10 +224,20 @@ describe('UpwordsBoard', () => {
         expect(moveResult.error).toBe(MoveErrorCode.SameTileStacked);
       });
 
+      it('should reject plays that completely cover existing words', () => {
+        const board = new UpwordsBoard();
+        // play the five tiles 'HELLO' from [4, 3] going horizontally
+        board.playTiles(makePlay('HELLO', [4, 3], PlayDirection.Horizontal));
+        // try to play the word 'WORLD' from [4, 3] going horizontally
+        // this should fail because it completely covers the existing word 'HELLO'
+        const moveResult = board.playTiles(makePlay('BOARD', [4, 3], PlayDirection.Horizontal));
+        expect(moveResult.isValid).toBe(false);
+        expect(moveResult.error).toBe(MoveErrorCode.CoversExistingWord);
+      });
+
       // Tests:
       // - Reject plays that completely cover existing words
       // - Reject first play that doesn't cover the four center squares
-      // - Reject plays with words shorter than 2 letters
       // - Rejected plays should not change the board
       // - Rejected plays should not be added to the play history
       // Advanced tests:
@@ -254,6 +264,25 @@ describe('UpwordsBoard', () => {
       // Make tests to play edge cases and validate responses
       // Tests:
       // - Play words with gaps
+      it('should handle complex cases when calculating whether a word is covered', () => {
+        const initialUBF = [
+          ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+          ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+          ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+          ['0 ', '0 ', '0 ', '0 ', '2B', '0 ', '0 ', '0 ', '0 ', '0 '],
+          ['0 ', '0 ', '3B', '0 ', '4A', '1N', '0 ', '3R', '2U', '2G'],
+          ['0 ', '0 ', '2A', '0 ', '3N', '0 ', '0 ', '3A', '0 ', '0 '],
+          ['0 ', '0 ', '1D', '1I', '1E', '1T', '1I', '1N', '1G', '0 '],
+          ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+          ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+          ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ']
+        ];
+        const board = new UpwordsBoard(initialUBF);
+        // Place the letters "LIO" to form the word "LION" from [4, 2] going horizontally
+        const moveResult = board.playTiles(makePlay('LIO', [4, 2], PlayDirection.Horizontal));
+        // This move should be valid, because no whole word is covered
+        expect(moveResult.isValid).toBe(true);
+      });
     });
   });
 
