@@ -14,7 +14,8 @@ enum MoveErrorCode {
   NotConnected,
   HasGap,
   SameTileStacked,
-  CoversExistingWord
+  CoversExistingWord,
+  FirstPlayDoesNotCoverCenter
 }
 type IUpwordsBoardFormat = string[][];
 type Coord = [number, number];
@@ -115,6 +116,10 @@ class UBFHelper {
     }
     return lineOfPlay;
   }
+
+  static boardIsEmpty(board: IUpwordsBoardFormat): boolean {
+    return board.every((row) => row.every((cell) => cell === '0 '));
+  }
 }
 
 interface IPlayValidationResult {
@@ -139,12 +144,37 @@ class IllegalPlay {
     };
   }
 
+  static firstPlayDoesNotCoverCenter(
+    board: IUpwordsBoardFormat,
+    play: IUpwordsPlay
+  ): IPlayValidationResult {
+    const newBoardState = UBFHelper.placeTiles(board, play);
+    // Check whether one of [4, 4], [4, 5], [5, 4], [5, 5] is covered
+    let centerCovered = false;
+    const centerTiles: Coord[] = [
+      [4, 4],
+      [4, 5],
+      [5, 4],
+      [5, 5]
+    ];
+    for (const [x, y] of centerTiles) {
+      if (newBoardState[x]![y] !== '0 ') {
+        centerCovered = true;
+        break;
+      }
+    }
+    return {
+      isIllegal: !centerCovered,
+      error: MoveErrorCode.FirstPlayDoesNotCoverCenter
+    };
+  }
+
   static playIsIsolated(board: IUpwordsBoardFormat, play: IUpwordsPlay): IPlayValidationResult {
     function coordIsInBounds(coord: Coord): boolean {
       const [x, y] = coord;
       return x >= 0 && x <= 9 && y >= 0 && y <= 9;
     }
-    if (board.every((row) => row.every((cell) => cell === '0 '))) {
+    if (UBFHelper.boardIsEmpty(board)) {
       // Don't check for isolation if the board is empty
       return { isIllegal: false, error: MoveErrorCode.NotConnected };
     }
@@ -362,7 +392,8 @@ class UpwordsBoard {
       IllegalPlay.playIsIsolated,
       IllegalPlay.playHasGap,
       IllegalPlay.sameTileStacked,
-      IllegalPlay.coversExistingWord
+      IllegalPlay.coversExistingWord,
+      IllegalPlay.firstPlayDoesNotCoverCenter
     ];
     for (const validation of boardValidations) {
       const result = validation(this.ubfBoard, play);

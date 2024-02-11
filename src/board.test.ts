@@ -235,9 +235,23 @@ describe('UpwordsBoard', () => {
         expect(moveResult.error).toBe(MoveErrorCode.CoversExistingWord);
       });
 
+      it('should reject first play that does not cover the four center squares', () => {
+        const board = new UpwordsBoard();
+        // try to play the word 'HELLO' from [3, 3] going horizontally
+        // this should fail because it does not cover the four center squares
+        const moveResult1 = board.playTiles(makePlay('HELLO', [3, 3], PlayDirection.Horizontal));
+        expect(moveResult1.isValid).toBe(false);
+        expect(moveResult1.error).toBe(MoveErrorCode.FirstPlayDoesNotCoverCenter);
+
+        // test with a vertical play
+        // try to play the word 'WORD' from [0, 4] going vertically
+        // this doesn't reach the center tiles by one square
+        const moveResult2 = board.playTiles(makePlay('WORD', [0, 4], PlayDirection.Vertical));
+        expect(moveResult2.isValid).toBe(false);
+        expect(moveResult2.error).toBe(MoveErrorCode.FirstPlayDoesNotCoverCenter);
+      });
+
       // Tests:
-      // - Reject plays that completely cover existing words
-      // - Reject first play that doesn't cover the four center squares
       // - Rejected plays should not change the board
       // - Rejected plays should not be added to the play history
       // Advanced tests:
