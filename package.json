@@ -5,8 +5,9 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "jest --verbose --coverage",
-    "test-precommit": "jest",
+    "test": "jest -o",
+    "test-full": "jest --verbose --coverage",
+    "test-precommit": "jest --coverage",
     "build": "tsc",
     "lint": "eslint . --ext .ts",
     "prettier-format": "prettier --config .prettierrc 'src/**/*' --write",
