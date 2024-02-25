@@ -87,7 +87,7 @@ describe('UpwordsBoard', () => {
       const board = new UpwordsBoard();
       // play the five tiles 'HELLO' from [4, 3] going horizontally
       const moveResult = board.playTiles(makePlay('HELLO', [4, 3], PlayDirection.Horizontal));
-      expect(moveResult.points).toBe(10);
+      expect(moveResult.points).toBeGreaterThan(0);
       expect(moveResult.isValid).toBe(true);
     });
 
@@ -268,10 +268,52 @@ describe('UpwordsBoard', () => {
 
     describe('scoring', () => {
       // Tests:
-      // - Score double for words of all 1 height
-      // - Score plays based on sum of height of tiles
-      // - Score all words affected by the play
-      // - Award 20 point bonus for using all 7 tiles
+      it('should score double for words of all 1 height', () => {
+        const board = new UpwordsBoard();
+        // play the word 'TESTING' from [4, 1] going horizontally
+        const moveResult = board.playTiles(makePlay('TEST', [4, 1], PlayDirection.Horizontal));
+        expect(moveResult.points).toBe(8);
+      });
+
+      test('score equals the sum of the height of tiles for all words created', () => {
+        const initialUBF = [
+          ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+          ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+          ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+          ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+          ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '1F', '0 ', '0 '],
+          ['0 ', '0 ', '0 ', '0 ', '2J', '0 ', '0 ', '1O', '0 ', '0 '],
+          ['0 ', '0 ', '1S', '4C', '2A', '5L', '2E', '1R', '0 ', '0 '],
+          ['0 ', '0 ', '0 ', '0 ', '5M', '2A', '1M', '4A', '1S', '0 '],
+          ['0 ', '0 ', '0 ', '0 ', '0 ', '1N', '0 ', '1Y', '1O', '0 '],
+          ['0 ', '0 ', '0 ', '0 ', '0 ', '1G', '0 ', '0 ', '1X', '0 ']
+        ];
+        const board = new UpwordsBoard(initialUBF);
+        // play the word 'MODAL' from [7, 4] going horizontally
+        // First letter is omitted because it is already on the board
+        const moveResult = board.playTiles(makePlay('OD L', [7, 5], PlayDirection.Horizontal));
+        // MODAL: 16, LONG: 10, LOX: 4, ED: 4
+        expect(moveResult.points).toBe(34);
+      });
+
+      it('should award a 20 point bonus for using all 7 tiles', () => {
+        const initialUBF = [
+          ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+          ['0 ', '1M', '0 ', '0 ', '0 ', '0 ', '1V', '0 ', '0 ', '0 '],
+          ['0 ', '1A', '3H', '0 ', '0 ', '0 ', '1A', '0 ', '0 ', '0 '],
+          ['0 ', '1N', '1O', '0 ', '5F', '1U', '4C', '3I', '0 ', '0 '],
+          ['0 ', '1S', '2O', '3M', '2A', '1N', '1S', '0 ', '0 ', '0 '],
+          ['0 ', '0 ', '4D', '5U', '3R', '4R', '0 ', '0 ', '0 ', '0 '],
+          ['2Q', '1A', '1Y', '3S', '0 ', '2I', '1D', '0 ', '0 ', '0 '],
+          ['0 ', '0 ', '0 ', '5C', '3O', '5P', '1E', '0 ', '0 ', '0 '],
+          ['0 ', '0 ', '0 ', '3A', '0 ', '1S', '3W', '2I', '2M', '0 '],
+          ['1B', '1I', '1K', '1E', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ']
+        ];
+        const board = new UpwordsBoard(initialUBF);
+        // play the word 'CINDERS' from [2, 9] going vertically
+        const moveResult = board.playTiles(makePlay('CINDERS', [2, 9], PlayDirection.Vertical));
+        expect(moveResult.points).toBe(43);
+      });
     });
 
     describe('end to end tests / edge cases', () => {

@@ -19,6 +19,12 @@ enum MoveErrorCode {
 }
 type IUpwordsBoardFormat = string[][];
 type Coord = [number, number];
+interface BoardCell {
+  letter: string;
+  coord: Coord;
+  height: number;
+}
+type BoardWord = BoardCell[];
 enum PlayDirection {
   Horizontal,
   Vertical
@@ -119,6 +125,94 @@ class UBFHelper {
 
   static boardIsEmpty(board: IUpwordsBoardFormat): boolean {
     return board.every((row) => row.every((cell) => cell === '0 '));
+  }
+
+  static scorePlay(board: IUpwordsBoardFormat, play: IUpwordsPlay): number {
+    const { tiles, start, direction } = play;
+    // For each tile placed, find all the words that are formed
+    // 1. Find the coordinates of the tiles placed (skip empty tiles)
+    const playCoordinates = [];
+    for (let i = 0; i < tiles.length; i++) {
+      if (direction === PlayDirection.Horizontal) {
+        if (play.tiles[i] !== ' ') {
+          playCoordinates.push(<Coord>[start[0], start[1] + i]);
+        }
+      } else if (direction === PlayDirection.Vertical) {
+        if (play.tiles[i] !== ' ') {
+          playCoordinates.push(<Coord>[start[0] + i, start[1]]);
+        }
+      }
+    }
+    // 2. For each tile, find the words that it touches in the new board state
+    const newBoardState = UBFHelper.placeTiles(board, play);
+    const words = [];
+    // Start with the direction of play (only one word)
+    words.push(this.findWord(newBoardState, playCoordinates[0]!, direction));
+    // Find words in the orthogonal direction
+    const orthogonal =
+      direction === PlayDirection.Horizontal ? PlayDirection.Vertical : PlayDirection.Horizontal;
+    for (const [x, y] of playCoordinates) {
+      const formedWord = this.findWord(newBoardState, [x, y], orthogonal);
+      if (formedWord.length >= 2) {
+        words.push(formedWord);
+      }
+    }
+    // 3. For each word, calculate the score and add it to the total
+    let score = 0;
+    for (const word of words) {
+      // Calculate the score for the word
+      const wordScore = word.reduce((acc, cell) => acc + cell.height, 0);
+      // Double the score if all heights are 1
+      if (word.every((cell) => cell.height === 1)) {
+        score += wordScore * 2;
+      } else {
+        score += wordScore;
+      }
+    }
+    // 4. If all 7 tiles are used, add 20 points to the score
+    if (tiles.length === 7) {
+      score += 20;
+    }
+    return score;
+  }
+
+  static findWord(board: IUpwordsBoardFormat, coord: Coord, direction: PlayDirection): BoardWord {
+    const word = [];
+    const [x, y] = coord;
+    if (direction === PlayDirection.Horizontal) {
+      // Find the start of the word
+      let currentY = y;
+      while (currentY > 0 && board[x]![currentY - 1] !== '0 ') {
+        currentY--;
+      }
+      // Collect the word
+      while (currentY < UBFHelper.boardLength && board[x]![currentY] !== '0 ') {
+        const cell: BoardCell = {
+          letter: board[x]![currentY]![1]!,
+          coord: [x, currentY],
+          height: parseInt(board[x]![currentY]![0]!)
+        };
+        word.push(cell);
+        currentY++;
+      }
+    } else if (direction === PlayDirection.Vertical) {
+      // Find the start of the word
+      let currentX = x;
+      while (currentX > 0 && board[currentX - 1]![y] !== '0 ') {
+        currentX--;
+      }
+      // Collect the word
+      while (currentX < UBFHelper.boardLength && board[currentX]![y] !== '0 ') {
+        const cell: BoardCell = {
+          letter: board[currentX]![y]![1]!,
+          coord: [currentX, y],
+          height: parseInt(board[currentX]![y]![0]!)
+        };
+        word.push(cell);
+        currentX++;
+      }
+    }
+    return word;
   }
 }
 
@@ -404,9 +498,10 @@ class UpwordsBoard {
         };
       }
     }
+    const points = UBFHelper.scorePlay(this.ubfBoard, play);
     this.ubfBoard = UBFHelper.placeTiles(this.ubfBoard, play);
     const moveResult = {
-      points: 10,
+      points,
       isValid: true
     };
     this.moveHistory.push(moveResult);
