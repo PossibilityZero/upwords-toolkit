@@ -55,6 +55,51 @@ class UBFHelper {
     return board.map((row) => row.map((tile) => tile));
   }
 
+  static getTileAt(board: IUpwordsBoardFormat, coord: Coord): string {
+    const [x, y] = coord;
+    const boardRow = board[x];
+    if (!boardRow) {
+      throw new RangeError(`Row ${x} does not exist`);
+    }
+    const tile = boardRow[y];
+    if (!tile) {
+      throw new RangeError(`Column ${y} does not exist in row ${x}`);
+    }
+    return tile;
+  }
+
+  static getHeightAt(board: IUpwordsBoardFormat, coord: Coord): number {
+    const height = this.getTileAt(board, coord)[0];
+    if (!height) {
+      throw new RangeError(`Height at ${coord} does not exist`);
+    }
+    return parseInt(height);
+  }
+
+  static getLetterAt(board: IUpwordsBoardFormat, coord: Coord): string {
+    const letter = this.getTileAt(board, coord)[1];
+    if (!letter) {
+      throw new RangeError(`Letter at ${coord} does not exist`);
+    }
+    return letter;
+  }
+
+  static offsetCoord(start: Coord, direction: PlayDirection, offset: number): Coord {
+    const [x, y] = start;
+    if (direction === PlayDirection.Horizontal) {
+      return [x, y + offset];
+    } else if (direction === PlayDirection.Vertical) {
+      return [x + offset, y];
+    }
+    throw new Error('Invalid direction');
+  }
+
+  static getOrthogonalDirection(direction: PlayDirection): PlayDirection {
+    return direction === PlayDirection.Horizontal
+      ? PlayDirection.Vertical
+      : PlayDirection.Horizontal;
+  }
+
   static placeSingleTile(
     board: IUpwordsBoardFormat,
     letter: string,
@@ -62,7 +107,7 @@ class UBFHelper {
   ): IUpwordsBoardFormat {
     const newBoard = UBFHelper.copyBoard(board);
     const [x, y] = coordinate;
-    const [currentHeight, currentLetter] = newBoard[x]![y]!.split('');
+    const [currentHeight, currentLetter] = this.getTileAt(newBoard, [x, y]).split('');
     if (letter === ' ') {
       newBoard[x]![y] = `${currentHeight}${currentLetter}`;
     } else {
@@ -74,7 +119,7 @@ class UBFHelper {
 
   static #placeTileMutate(board: IUpwordsBoardFormat, letter: string, coordinate: Coord): void {
     const [x, y] = coordinate;
-    const [currentHeight, currentLetter] = board[x]![y]!.split('');
+    const [currentHeight, currentLetter] = this.getTileAt(board, [x, y]).split('');
     if (letter === ' ') {
       board[x]![y] = `${currentHeight}${currentLetter}`;
     } else {
@@ -86,19 +131,10 @@ class UBFHelper {
   static placeTiles(board: IUpwordsBoardFormat, play: IUpwordsPlay): IUpwordsBoardFormat {
     const { tiles, start, direction } = play;
     const newBoard = UBFHelper.copyBoard(board);
-    const [startX, startY] = start;
-    if (direction === PlayDirection.Horizontal) {
-      let i = 0;
-      for (const letter of tiles) {
-        UBFHelper.#placeTileMutate(newBoard, letter, [startX, startY + i]);
-        i++;
-      }
-    } else if (direction === PlayDirection.Vertical) {
-      let i = 0;
-      for (const letter of tiles) {
-        UBFHelper.#placeTileMutate(newBoard, letter, [startX + i, startY]);
-        i++;
-      }
+    let i = 0;
+    for (const letter of tiles) {
+      UBFHelper.#placeTileMutate(newBoard, letter, this.offsetCoord(start, direction, i));
+      i++;
     }
     return newBoard;
   }
@@ -133,14 +169,8 @@ class UBFHelper {
     // 1. Find the coordinates of the tiles placed (skip empty tiles)
     const playCoordinates = [];
     for (let i = 0; i < tiles.length; i++) {
-      if (direction === PlayDirection.Horizontal) {
-        if (play.tiles[i] !== ' ') {
-          playCoordinates.push(<Coord>[start[0], start[1] + i]);
-        }
-      } else if (direction === PlayDirection.Vertical) {
-        if (play.tiles[i] !== ' ') {
-          playCoordinates.push(<Coord>[start[0] + i, start[1]]);
-        }
+      if (tiles[i] !== ' ') {
+        playCoordinates.push(UBFHelper.offsetCoord(start, direction, i));
       }
     }
     // 2. For each tile, find the words that it touches in the new board state
@@ -149,8 +179,7 @@ class UBFHelper {
     // Start with the direction of play (only one word)
     words.push(this.findWord(newBoardState, playCoordinates[0]!, direction));
     // Find words in the orthogonal direction
-    const orthogonal =
-      direction === PlayDirection.Horizontal ? PlayDirection.Vertical : PlayDirection.Horizontal;
+    const orthogonal = UBFHelper.getOrthogonalDirection(direction);
     for (const [x, y] of playCoordinates) {
       const formedWord = this.findWord(newBoardState, [x, y], orthogonal);
       if (formedWord.length >= 2) {
@@ -182,15 +211,15 @@ class UBFHelper {
     if (direction === PlayDirection.Horizontal) {
       // Find the start of the word
       let currentY = y;
-      while (currentY > 0 && board[x]![currentY - 1] !== '0 ') {
+      while (currentY > 0 && this.getTileAt(board, [x, currentY - 1]) !== '0 ') {
         currentY--;
       }
       // Collect the word
-      while (currentY < UBFHelper.boardLength && board[x]![currentY] !== '0 ') {
+      while (currentY < UBFHelper.boardLength && this.getTileAt(board, [x, currentY]) !== '0 ') {
         const cell: BoardCell = {
-          letter: board[x]![currentY]![1]!,
+          letter: this.getLetterAt(board, [x, currentY]),
           coord: [x, currentY],
-          height: parseInt(board[x]![currentY]![0]!)
+          height: this.getHeightAt(board, [x, currentY])
         };
         word.push(cell);
         currentY++;
@@ -198,15 +227,15 @@ class UBFHelper {
     } else if (direction === PlayDirection.Vertical) {
       // Find the start of the word
       let currentX = x;
-      while (currentX > 0 && board[currentX - 1]![y] !== '0 ') {
+      while (currentX > 0 && this.getTileAt(board, [currentX - 1, y]) !== '0 ') {
         currentX--;
       }
       // Collect the word
-      while (currentX < UBFHelper.boardLength && board[currentX]![y] !== '0 ') {
+      while (currentX < UBFHelper.boardLength && this.getTileAt(board, [currentX, y]) !== '0 ') {
         const cell: BoardCell = {
-          letter: board[currentX]![y]![1]!,
+          letter: this.getTileAt(board, [currentX, y])[1]!,
           coord: [currentX, y],
-          height: parseInt(board[currentX]![y]![0]!)
+          height: parseInt(this.getTileAt(board, [currentX, y])[0]!)
         };
         word.push(cell);
         currentX++;
@@ -252,7 +281,7 @@ class IllegalPlay {
       [5, 5]
     ];
     for (const [x, y] of centerTiles) {
-      if (newBoardState[x]![y] !== '0 ') {
+      if (UBFHelper.getHeightAt(newBoardState, [x, y]) > 0) {
         centerCovered = true;
         break;
       }
@@ -274,34 +303,21 @@ class IllegalPlay {
     }
     let isIllegal = false;
     const { tiles, start, direction } = play;
-    const [startX, startY] = start;
     const adjacentCoords = [];
-    if (direction === PlayDirection.Horizontal) {
-      // push the coordinates before and after the play
-      adjacentCoords.push([startX, startY - 1] as Coord, [startX, startY + tiles.length] as Coord);
-      for (let i = 0; i < tiles.length; i++) {
-        // push the current, above, and below coordinates
-        adjacentCoords.push(
-          [startX, startY + i] as Coord,
-          [startX - 1, startY + i] as Coord,
-          [startX + 1, startY + i] as Coord
-        );
-      }
-    } else if (direction === PlayDirection.Vertical) {
-      adjacentCoords.push([startX - 1, startY] as Coord, [startX + tiles.length, startY] as Coord);
-      for (let i = 0; i < tiles.length; i++) {
-        // push the current, left, and right coordinates
-        adjacentCoords.push(
-          [startX + i, startY] as Coord,
-          [startX + i, startY - 1] as Coord,
-          [startX + i, startY + 1] as Coord
-        );
-      }
+    // push the coordinates before and after the play
+    const beforePlayCoord = UBFHelper.offsetCoord(start, direction, -1);
+    const afterPlayCoord = UBFHelper.offsetCoord(start, direction, tiles.length);
+    adjacentCoords.push(beforePlayCoord, afterPlayCoord);
+
+    const orthogonal = UBFHelper.getOrthogonalDirection(direction);
+    for (let i = 0; i < tiles.length; i++) {
+      const playCoord = UBFHelper.offsetCoord(start, direction, i);
+      const adjacentPrev = UBFHelper.offsetCoord(playCoord, orthogonal, -1);
+      const adjacentNext = UBFHelper.offsetCoord(playCoord, orthogonal, 1);
+      adjacentCoords.push(playCoord, adjacentPrev, adjacentNext);
     }
     const touchesExistingTile = adjacentCoords.filter(coordIsInBounds).some((coord) => {
-      const [x, y] = coord;
-      const cell = board[x]![y]!;
-      return cell !== '0 ';
+      return UBFHelper.getHeightAt(board, coord) > 0;
     });
     isIllegal = !touchesExistingTile;
     return {
@@ -313,20 +329,11 @@ class IllegalPlay {
   static sameTileStacked(board: IUpwordsBoardFormat, play: IUpwordsPlay): IPlayValidationResult {
     let isIllegal = false;
     const { tiles, start, direction } = play;
-    const [startX, startY] = start;
-    if (direction === PlayDirection.Horizontal) {
-      for (let i = 0; i < tiles.length; i++) {
-        const cell = board[startX]![startY + i]!;
-        if (cell[1] === tiles[i]) {
-          isIllegal = true;
-        }
-      }
-    } else if (direction === PlayDirection.Vertical) {
-      for (let i = 0; i < tiles.length; i++) {
-        const cell = board[startX + i]![startY]!;
-        if (cell[1] === tiles[i]) {
-          isIllegal = true;
-        }
+    for (let i = 0; i < tiles.length; i++) {
+      const newCoord = UBFHelper.offsetCoord(start, direction, i);
+      if (UBFHelper.getLetterAt(board, newCoord) === tiles[i]) {
+        isIllegal = true;
+        break;
       }
     }
     return {
@@ -339,20 +346,11 @@ class IllegalPlay {
     let isIllegal = false;
     const { tiles, start, direction } = play;
     const boardAfterPlay = UBFHelper.placeTiles(board, play);
-    const [startX, startY] = start;
-    if (direction === PlayDirection.Horizontal) {
-      for (let i = 0; i < tiles.length; i++) {
-        const cell = boardAfterPlay[startX]![startY + i]!;
-        if (cell === '0 ') {
-          isIllegal = true;
-        }
-      }
-    } else if (direction === PlayDirection.Vertical) {
-      for (let i = 0; i < tiles.length; i++) {
-        const cell = boardAfterPlay[startX + i]![startY]!;
-        if (cell === '0 ') {
-          isIllegal = true;
-        }
+    for (let i = 0; i < tiles.length; i++) {
+      const newCoord = UBFHelper.offsetCoord(start, direction, i);
+      if (UBFHelper.getHeightAt(boardAfterPlay, newCoord) === 0) {
+        isIllegal = true;
+        break;
       }
     }
     return {
@@ -469,7 +467,7 @@ class UpwordsBoard {
   }
 
   playTiles(play: IUpwordsPlay): IMoveResult {
-    // Play validations
+    // Check: Play validations
     const playValidations = [IllegalPlay.playOutOfBounds];
     for (const validation of playValidations) {
       const result = validation(play);
@@ -480,7 +478,7 @@ class UpwordsBoard {
         };
       }
     }
-    // Play and Board validations
+    // Check: Play and Board validations
     const boardValidations = [
       IllegalPlay.exceedsHeightLimit,
       IllegalPlay.playIsIsolated,
@@ -498,6 +496,7 @@ class UpwordsBoard {
         };
       }
     }
+    // Play is valid, calculate points and update the board
     const points = UBFHelper.scorePlay(this.ubfBoard, play);
     this.ubfBoard = UBFHelper.placeTiles(this.ubfBoard, play);
     const moveResult = {
