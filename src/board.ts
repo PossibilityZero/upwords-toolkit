@@ -144,17 +144,11 @@ class UBFHelper {
     coord: Coord,
     direction: PlayDirection
   ): string[] {
+    const [x, y] = coord;
+    const lineStart: Coord = direction === PlayDirection.Horizontal ? [x, 0] : [0, y];
     const lineOfPlay = [];
-    if (direction === PlayDirection.Horizontal) {
-      const coordX = coord[0];
-      for (let i = 0; i < UBFHelper.boardLength; i++) {
-        lineOfPlay.push(board[coordX]![i]!);
-      }
-    } else if (direction === PlayDirection.Vertical) {
-      const coordY = coord[1];
-      for (let i = 0; i < UBFHelper.boardLength; i++) {
-        lineOfPlay.push(board[i]![coordY]!);
-      }
+    for (let i = 0; i < UBFHelper.boardLength; i++) {
+      lineOfPlay.push(UBFHelper.getTileAt(board, UBFHelper.offsetCoord(lineStart, direction, i)));
     }
     return lineOfPlay;
   }
@@ -208,39 +202,29 @@ class UBFHelper {
   static findWord(board: IUpwordsBoardFormat, coord: Coord, direction: PlayDirection): BoardWord {
     const word = [];
     const [x, y] = coord;
-    if (direction === PlayDirection.Horizontal) {
-      // Find the start of the word
-      let currentY = y;
-      while (currentY > 0 && this.getTileAt(board, [x, currentY - 1]) !== '0 ') {
-        currentY--;
-      }
-      // Collect the word
-      while (currentY < UBFHelper.boardLength && this.getTileAt(board, [x, currentY]) !== '0 ') {
-        const cell: BoardCell = {
-          letter: this.getLetterAt(board, [x, currentY]),
-          coord: [x, currentY],
-          height: this.getHeightAt(board, [x, currentY])
-        };
-        word.push(cell);
-        currentY++;
-      }
-    } else if (direction === PlayDirection.Vertical) {
-      // Find the start of the word
-      let currentX = x;
-      while (currentX > 0 && this.getTileAt(board, [currentX - 1, y]) !== '0 ') {
-        currentX--;
-      }
-      // Collect the word
-      while (currentX < UBFHelper.boardLength && this.getTileAt(board, [currentX, y]) !== '0 ') {
-        const cell: BoardCell = {
-          letter: this.getTileAt(board, [currentX, y])[1]!,
-          coord: [currentX, y],
-          height: parseInt(this.getTileAt(board, [currentX, y])[0]!)
-        };
-        word.push(cell);
-        currentX++;
+    // Find the start of the word
+    let i;
+    const pos = direction === PlayDirection.Horizontal ? y : x;
+    for (i = 1; i <= pos; i++) {
+      if (this.getHeightAt(board, this.offsetCoord(coord, direction, -i)) === 0) {
+        i--;
+        break;
       }
     }
+    let wordCoord = this.offsetCoord(coord, direction, -i);
+    // Collect the word
+    do {
+      const cell: BoardCell = {
+        letter: this.getLetterAt(board, wordCoord),
+        coord: wordCoord,
+        height: this.getHeightAt(board, wordCoord)
+      };
+      word.push(cell);
+      wordCoord = this.offsetCoord(wordCoord, direction, 1);
+    } while (
+      wordCoord.every((c) => c < UBFHelper.boardLength) &&
+      this.getHeightAt(board, wordCoord) !== 0
+    );
     return word;
   }
 }
@@ -254,11 +238,9 @@ class IllegalPlay {
     let isIllegal = false;
     const { tiles, start, direction } = play;
     const length = tiles.trimEnd().length;
-    if (start[0] < 0 || start[1] < 0) {
+    if (start.some((coord) => coord < 0)) {
       isIllegal = true;
-    } else if (direction === PlayDirection.Vertical && start[0] + length - 1 > 9) {
-      isIllegal = true;
-    } else if (direction === PlayDirection.Horizontal && start[1] + length - 1 > 9) {
+    } else if (UBFHelper.offsetCoord(start, direction, length - 1).some((coord) => coord > 9)) {
       isIllegal = true;
     }
     return {
