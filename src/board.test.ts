@@ -320,6 +320,7 @@ describe('UpwordsBoard', () => {
       // Make tests to play edge cases and validate responses
       // Tests:
       // - Play words with gaps
+      // - Reject plays with only one invalid word
       it('should handle complex cases when calculating whether a word is covered', () => {
         const initialUBF = [
           ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],

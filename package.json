@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "test": "jest -o",
+    "test-watch": "jest --watchAll",
     "test-full": "jest --verbose --coverage",
     "test-precommit": "jest --coverage",
     "build": "tsc",
