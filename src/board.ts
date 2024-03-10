@@ -434,6 +434,15 @@ class IllegalPlay {
 class UpwordsBoard {
   private ubfBoard: IUpwordsBoardFormat;
   private moveHistory: IMoveResult[];
+  private static playValidations = [IllegalPlay.playOutOfBounds];
+  private static boardValidations = [
+    IllegalPlay.exceedsHeightLimit,
+    IllegalPlay.playIsIsolated,
+    IllegalPlay.playHasGap,
+    IllegalPlay.sameTileStacked,
+    IllegalPlay.coversExistingWord,
+    IllegalPlay.firstPlayDoesNotCoverCenter
+  ];
 
   constructor(initialUBF?: IUpwordsBoardFormat) {
     this.moveHistory = [];
@@ -448,10 +457,9 @@ class UpwordsBoard {
     return UBFHelper.copyBoard(this.ubfBoard);
   }
 
-  playTiles(play: IUpwordsPlay): IMoveResult {
+  #validatePlay(play: IUpwordsPlay): IMoveResult {
     // Check: Play validations
-    const playValidations = [IllegalPlay.playOutOfBounds];
-    for (const validation of playValidations) {
+    for (const validation of UpwordsBoard.playValidations) {
       const result = validation(play);
       if (result.isIllegal) {
         return {
@@ -461,15 +469,7 @@ class UpwordsBoard {
       }
     }
     // Check: Play and Board validations
-    const boardValidations = [
-      IllegalPlay.exceedsHeightLimit,
-      IllegalPlay.playIsIsolated,
-      IllegalPlay.playHasGap,
-      IllegalPlay.sameTileStacked,
-      IllegalPlay.coversExistingWord,
-      IllegalPlay.firstPlayDoesNotCoverCenter
-    ];
-    for (const validation of boardValidations) {
+    for (const validation of UpwordsBoard.boardValidations) {
       const result = validation(this.ubfBoard, play);
       if (result.isIllegal) {
         return {
@@ -477,6 +477,14 @@ class UpwordsBoard {
           error: result.error
         };
       }
+    }
+    return { isValid: true };
+  }
+
+  playTiles(play: IUpwordsPlay): IMoveResult {
+    const validation = this.#validatePlay(play);
+    if (!validation.isValid) {
+      return validation;
     }
     // Play is valid, calculate points and update the board
     const points = UBFHelper.scorePlay(this.ubfBoard, play);
