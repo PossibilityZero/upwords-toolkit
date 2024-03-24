@@ -1,3 +1,6 @@
+import fs from 'fs';
+import path from 'path';
+
 interface IUpwordsPlay {
   tiles: string;
   start: Coord;
@@ -15,7 +18,8 @@ enum MoveErrorCode {
   HasGap,
   SameTileStacked,
   CoversExistingWord,
-  FirstPlayDoesNotCoverCenter
+  FirstPlayDoesNotCoverCenter,
+  InvalidWord
 }
 type IUpwordsBoardFormat = string[][];
 type Coord = [number, number];
@@ -227,6 +231,32 @@ class UBFHelper {
     );
     return word;
   }
+
+  static getWordsFromPlay(board: IUpwordsBoardFormat, play: IUpwordsPlay): BoardWord[] {
+    const { tiles, start, direction } = play;
+    // For each tile placed, find all the words that are formed
+    // 1. Find the coordinates of the tiles placed (skip empty tiles)
+    const playCoordinates = [];
+    for (let i = 0; i < tiles.length; i++) {
+      if (tiles[i] !== ' ') {
+        playCoordinates.push(UBFHelper.offsetCoord(start, direction, i));
+      }
+    }
+    // 2. For each tile, find the words that it touches in the new board state
+    const newBoardState = UBFHelper.placeTiles(board, play);
+    const words = [];
+    // Start with the direction of play (only one word)
+    words.push(this.findWord(newBoardState, playCoordinates[0]!, direction));
+    // Find words in the orthogonal direction
+    const orthogonal = UBFHelper.getOrthogonalDirection(direction);
+    for (const [x, y] of playCoordinates) {
+      const formedWord = this.findWord(newBoardState, [x, y], orthogonal);
+      if (formedWord.length >= 2) {
+        words.push(formedWord);
+      }
+    }
+    return words;
+  }
 }
 
 interface IPlayValidationResult {
@@ -429,6 +459,31 @@ class IllegalPlay {
       error: MoveErrorCode.HeightLimitExceeded
     };
   }
+
+  static wordIsInvalid(board: IUpwordsBoardFormat, play: IUpwordsPlay): IPlayValidationResult {
+    const validWords = fs
+      .readFileSync(path.resolve(__dirname, '../data/dictionary.txt'), 'utf8')
+      .split('\n');
+    const words = UBFHelper.getWordsFromPlay(board, play);
+    const formedWords = words.map((word) =>
+      word
+        .map((cell) => cell.letter)
+        .join('')
+        .toLowerCase()
+    );
+    for (const word of formedWords) {
+      if (!validWords.includes(word)) {
+        return {
+          isIllegal: true,
+          error: MoveErrorCode.InvalidWord
+        };
+      }
+    }
+    return {
+      isIllegal: false,
+      error: MoveErrorCode.InvalidWord
+    };
+  }
 }
 
 class UpwordsBoard {
@@ -441,7 +496,8 @@ class UpwordsBoard {
     IllegalPlay.playHasGap,
     IllegalPlay.sameTileStacked,
     IllegalPlay.coversExistingWord,
-    IllegalPlay.firstPlayDoesNotCoverCenter
+    IllegalPlay.firstPlayDoesNotCoverCenter,
+    IllegalPlay.wordIsInvalid
   ];
 
   constructor(initialUBF?: IUpwordsBoardFormat) {

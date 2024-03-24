@@ -259,10 +259,14 @@ describe('UpwordsBoard', () => {
     });
 
     describe('word checking', () => {
+      it('should reject words that are not in the dictionary', () => {
+        const board = new UpwordsBoard();
+        const moveResult = board.playTiles(makePlay('TBULGR', [4, 3], PlayDirection.Horizontal));
+        expect(moveResult.isValid).toBe(false);
+        expect(moveResult.error).toBe(MoveErrorCode.InvalidWord);
+      });
+
       // Tests:
-      // - Check that words are in the dictionary
-      // - Check that words are not proper nouns
-      // - Check that words are more than 1 letter
       // - Check that "Q" is treated as "Qu" for spelling
     });
 
