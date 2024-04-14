@@ -19,7 +19,8 @@ enum MoveErrorCode {
   SameTileStacked,
   CoversExistingWord,
   FirstPlayDoesNotCoverCenter,
-  InvalidWord
+  InvalidWord,
+  OnlyPluralizesWord
 }
 type IUpwordsBoardFormat = string[][];
 type Coord = [number, number];
@@ -215,6 +216,7 @@ class UBFHelper {
         break;
       }
     }
+    i = i > pos ? pos : i; // if the start of the word is at the edge of the board
     let wordCoord = this.offsetCoord(coord, direction, -i);
     // Collect the word
     do {
@@ -251,11 +253,9 @@ class UBFHelper {
     const orthogonal = UBFHelper.getOrthogonalDirection(direction);
     for (const [x, y] of playCoordinates) {
       const formedWord = this.findWord(newBoardState, [x, y], orthogonal);
-      if (formedWord.length >= 2) {
-        words.push(formedWord);
-      }
+      words.push(formedWord);
     }
-    return words;
+    return words.filter((word) => word.length >= 2);
   }
 }
 
@@ -468,8 +468,9 @@ class IllegalPlay {
     const formedWords = words.map((word) =>
       word
         .map((cell) => cell.letter)
+        .map((letter) => letter.toLowerCase())
+        .map((letter) => (letter === 'q' ? 'qu' : letter))
         .join('')
-        .toLowerCase()
     );
     for (const word of formedWords) {
       if (!validWords.includes(word)) {
@@ -482,6 +483,44 @@ class IllegalPlay {
     return {
       isIllegal: false,
       error: MoveErrorCode.InvalidWord
+    };
+  }
+
+  static onlyAddsPlural(board: IUpwordsBoardFormat, play: IUpwordsPlay): IPlayValidationResult {
+    let isIllegal = false;
+    // Only check if the play is a single S
+    checkPluralConditions: if (play.tiles.trim() === 'S') {
+      // Get coordinate of the S
+      const position = play.tiles.indexOf('S');
+      const [x, y] = UBFHelper.offsetCoord(play.start, play.direction, position);
+      // Check if it's on a 0-height square
+      if (UBFHelper.getHeightAt(board, [x, y]) !== 0) {
+        break checkPluralConditions;
+      }
+      // Check if it's the last letter in both directions
+      const words = UBFHelper.getWordsFromPlay(board, play);
+      const isLastLetter = words.every((word) => {
+        const lastLetter = word[word.length - 1];
+        return lastLetter!.coord[0] === x && lastLetter!.coord[1] === y;
+      });
+      if (!isLastLetter) {
+        break checkPluralConditions;
+      }
+      // Check if all words formed are 3 letters or longer
+      // (Adding an S to form a 2 letter word is not a pluralization)
+      if (words.some((word) => word.length < 3)) {
+        break checkPluralConditions;
+      }
+      // Check that the previous word does not end in S
+      if (words.some((word) => word[word.length - 2]!.letter === 'S')) {
+        break checkPluralConditions;
+      }
+      // If all the above conditions are met, the play is illegal
+      isIllegal = true;
+    }
+    return {
+      isIllegal,
+      error: MoveErrorCode.OnlyPluralizesWord
     };
   }
 }
@@ -497,7 +536,8 @@ class UpwordsBoard {
     IllegalPlay.sameTileStacked,
     IllegalPlay.coversExistingWord,
     IllegalPlay.firstPlayDoesNotCoverCenter,
-    IllegalPlay.wordIsInvalid
+    IllegalPlay.wordIsInvalid,
+    IllegalPlay.onlyAddsPlural
   ];
 
   constructor(initialUBF?: IUpwordsBoardFormat) {

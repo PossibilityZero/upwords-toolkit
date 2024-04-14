@@ -254,20 +254,119 @@ describe('UpwordsBoard', () => {
       // Tests:
       // - Rejected plays should not change the board
       // - Rejected plays should not be added to the play history
-      // Advanced tests:
-      // - Reject plays that only pluralize existing words with an S
+
+      describe('rejecting plays that only pluralize existing words with an S', () => {
+        // In the Upwords app, this is implemented by checking if the play appends
+        // an S to an existing word which doesn't end in S, regardless of whether
+        // the resulting word is actually a pluralization of the original word.
+        // This is a slightly lazy implementation, but here we are mimicking the
+        // app's behavior for the sake of compatibility.
+        it('should reject plays that only append an S to words', () => {
+          // one word and two
+          const initialUBF = [
+            ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+            ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '1A', '0 ', '0 '],
+            ['0 ', '0 ', '0 ', '0 ', '0 ', '1C', '1A', '1R', '1T', '0 '],
+            ['0 ', '0 ', '0 ', '0 ', '0 ', '1A', '0 ', '1T', '0 ', '0 '],
+            ['0 ', '0 ', '0 ', '1W', '1O', '1R', '1D', '0 ', '0 ', '0 '],
+            ['0 ', '0 ', '0 ', '0 ', '0 ', '1E', '0 ', '0 ', '0 ', '0 '],
+            ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+            ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+            ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+            ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ']
+          ];
+          const board = new UpwordsBoard(initialUBF);
+          // vertical: CARE -> CARES
+          const moveResult1 = board.playTiles(makePlay('S', [6, 5], PlayDirection.Vertical));
+          expect(moveResult1.isValid).toBe(false);
+          expect(moveResult1.error).toBe(MoveErrorCode.OnlyPluralizesWord);
+          // horizontal: CART -> CARTS
+          const moveResult2 = board.playTiles(makePlay('S', [2, 9], PlayDirection.Horizontal));
+          expect(moveResult2.isValid).toBe(false);
+          expect(moveResult2.error).toBe(MoveErrorCode.OnlyPluralizesWord);
+          // 2 words: WORDs and ARTs
+          const moveResult3 = board.playTiles(makePlay('S', [4, 7], PlayDirection.Horizontal));
+          expect(moveResult3.isValid).toBe(false);
+          expect(moveResult3.error).toBe(MoveErrorCode.OnlyPluralizesWord);
+        });
+
+        // Allow various other cases of adding S to words
+        it('should allow adding an S to a word if the word already ends in S', () => {
+          const initialUBF = [
+            ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+            ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+            ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+            ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+            ['0 ', '0 ', '0 ', '1H', '1I', '1S', '0 ', '0 ', '0 ', '0 '],
+            ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+            ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+            ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+            ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+            ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ']
+          ];
+          const board = new UpwordsBoard(initialUBF);
+          // HIS -> HISS
+          const moveResult = board.playTiles(makePlay('S', [4, 6], PlayDirection.Horizontal));
+          expect(moveResult.isValid).toBe(true);
+        });
+
+        it('should allow single S plays that are not pluralizations', () => {
+          const initialUBF = [
+            ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+            ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+            ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+            ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+            ['0 ', '0 ', '0 ', '1H', '1E', '1L', '1L', '0 ', '0 ', '0 '],
+            ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+            ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+            ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+            ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+            ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ']
+          ];
+          const board = new UpwordsBoard(initialUBF);
+          // Adding single S to the start of a word
+          const moveResult1 = board.playTiles(makePlay('S', [4, 2], PlayDirection.Vertical));
+          expect(moveResult1.isValid).toBe(true);
+          // Adding single S to form a 2-letter word
+          const moveResult2 = board.playTiles(makePlay('S', [5, 4], PlayDirection.Vertical));
+          expect(moveResult2.isValid).toBe(true);
+        });
+
+        it('should allow adding an S to a word if it is a pluralization but also forms a new word', () => {
+          const initialUBF = [
+            ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+            ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '1A', '0 ', '0 ', '0 '],
+            ['0 ', '0 ', '0 ', '0 ', '1T', '1O', '1P', '0 ', '0 ', '0 '],
+            ['0 ', '0 ', '0 ', '0 ', '1R', '0 ', '1E', '0 ', '0 ', '0 '],
+            ['0 ', '0 ', '0 ', '1H', '1I', '1S', '0 ', '0 ', '0 ', '0 '],
+            ['0 ', '0 ', '0 ', '0 ', '1P', '0 ', '0 ', '0 ', '0 ', '0 '],
+            ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+            ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+            ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+            ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ']
+          ];
+          const board = new UpwordsBoard(initialUBF);
+          // Horizontally, "HISS" makes this safe
+          const moveResult = board.playTiles(makePlay('S', [4, 6], PlayDirection.Horizontal));
+          expect(moveResult.isValid).toBe(true);
+        });
+      });
     });
 
     describe('word checking', () => {
       it('should reject words that are not in the dictionary', () => {
         const board = new UpwordsBoard();
-        const moveResult = board.playTiles(makePlay('TBULGR', [4, 3], PlayDirection.Horizontal));
+        const moveResult = board.playTiles(makePlay('SSPACE', [4, 3], PlayDirection.Horizontal));
         expect(moveResult.isValid).toBe(false);
         expect(moveResult.error).toBe(MoveErrorCode.InvalidWord);
       });
 
-      // Tests:
-      // - Check that "Q" is treated as "Qu" for spelling
+      it('should treat "Q" as "Qu" for spelling', () => {
+        const board = new UpwordsBoard();
+        // play the word 'QUICK' from [4, 3] going horizontally
+        const moveResult = board.playTiles(makePlay('QICK', [4, 3], PlayDirection.Horizontal));
+        expect(moveResult.isValid).toBe(true);
+      });
     });
 
     describe('scoring', () => {
@@ -342,6 +441,25 @@ describe('UpwordsBoard', () => {
         // Place the letters "LIO" to form the word "LION" from [4, 2] going horizontally
         const moveResult = board.playTiles(makePlay('LIO', [4, 2], PlayDirection.Horizontal));
         // This move should be valid, because no whole word is covered
+        expect(moveResult.isValid).toBe(true);
+      });
+
+      it('should handle words at the edge of the board', () => {
+        const initialUBF = [
+          ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '1C', '0 ', '0 ', '0 '],
+          ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '1A', '0 ', '0 ', '0 '],
+          ['0 ', '0 ', '0 ', '0 ', '1T', '1O', '1P', '0 ', '0 ', '0 '],
+          ['0 ', '0 ', '0 ', '0 ', '1R', '0 ', '1E', '0 ', '0 ', '0 '],
+          ['0 ', '0 ', '0 ', '1H', '1I', '1S', '0 ', '0 ', '0 ', '0 '],
+          ['0 ', '0 ', '0 ', '0 ', '1P', '0 ', '0 ', '0 ', '0 ', '0 '],
+          ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+          ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+          ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+          ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ']
+        ];
+        const board = new UpwordsBoard(initialUBF);
+        // Horizontally, "HISS" makes this safe
+        const moveResult = board.playTiles(makePlay('S', [4, 6], PlayDirection.Horizontal));
         expect(moveResult.isValid).toBe(true);
       });
     });
