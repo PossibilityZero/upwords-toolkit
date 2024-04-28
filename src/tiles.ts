@@ -59,7 +59,7 @@ type FullTiles = {
 };
 
 class TileSet {
-  private tiles: FullTiles;
+  protected tiles: FullTiles;
 
   constructor() {
     // Dynamically generate the A-Z tiles
@@ -86,8 +86,9 @@ class TileSet {
     });
   }
 
-  public removeTile(letter: keyof FullTiles, count: number): void {
+  public removeTile(letter: keyof FullTiles, count: number): Tiles {
     this.tiles[letter] -= count;
+    return { [letter]: count };
   }
 
   public removeTiles(letters: Tiles): void {
@@ -99,6 +100,12 @@ class TileSet {
   public setTiles(letters: Tiles): void {
     Object.entries(letters).forEach(([letter, count]) => {
       this.tiles[letter as keyof FullTiles] = count;
+    });
+  }
+
+  public deleteAllTiles(): void {
+    Object.keys(this.tiles).forEach((letter) => {
+      this.tiles[letter as keyof FullTiles] = 0;
     });
   }
 }
@@ -113,6 +120,10 @@ class TileRack extends TileSet {
 
   public get tileCountTarget(): number {
     return this._tileCountTarget;
+  }
+
+  public getMissingTiles(): number {
+    return this.tileCountTarget - this.tileCount;
   }
 }
 
@@ -147,6 +158,36 @@ class TileBag extends TileSet {
       Y: 2,
       Z: 1
     });
+  }
+
+  public drawRandomTile(): Tiles {
+    const allTiles = Object.entries(this.tiles).reduce(
+      (combined, letter) => combined.concat(letter[0].repeat(letter[1])),
+      ''
+    );
+    const randomIndex = Math.floor(Math.random() * allTiles.length);
+    const randomLetter = allTiles[randomIndex] as keyof FullTiles;
+    return this.removeTile(randomLetter, 1);
+  }
+
+  public drawRandomVowel(): Tiles {
+    const allVowels = Object.entries(this.tiles).reduce(function (combined, letter) {
+      const count = 'AEIOU'.includes(letter[0]) ? letter[1] : 0;
+      return combined.concat(letter[0].repeat(count));
+    }, '');
+    const randomIndex = Math.floor(Math.random() * allVowels.length);
+    const randomVowel = allVowels[randomIndex] as keyof FullTiles;
+    return this.removeTile(randomVowel, 1);
+  }
+
+  public drawRandomConsonant(): Tiles {
+    const allVowels = Object.entries(this.tiles).reduce(function (combined, letter) {
+      const count = 'AEIOU'.includes(letter[0]) ? 0 : letter[1];
+      return combined.concat(letter[0].repeat(count));
+    }, '');
+    const randomIndex = Math.floor(Math.random() * allVowels.length);
+    const randomVowel = allVowels[randomIndex] as keyof FullTiles;
+    return this.removeTile(randomVowel, 1);
   }
 }
 

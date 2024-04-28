@@ -67,6 +67,16 @@ describe('TileSet', () => {
       expect(newTileSet.tileCount).toBe(7);
     });
   });
+
+  describe('deleteAllTiles', () => {
+    it('should reset the count of all letters to 0', () => {
+      const newTileSet = new TileSet();
+      newTileSet.addTiles({ A: 1, B: 2, C: 3 });
+      newTileSet.setTiles({ A: 3, C: 2 });
+      newTileSet.deleteAllTiles();
+      expect(newTileSet.tileCount).toBe(0);
+    });
+  });
 });
 
 describe('TileRack', () => {
@@ -75,6 +85,14 @@ describe('TileRack', () => {
       const playerRack = new TileRack();
       expect(playerRack.tileCount).toBe(0);
       expect(playerRack.tileCountTarget).toBe(7);
+    });
+  });
+
+  describe('getMissingTiles', () => {
+    it('should return the number of tiles needed to reach the target', () => {
+      const playerRack = new TileRack();
+      playerRack.setTiles({ A: 1, D: 1, E: 1 });
+      expect(playerRack.getMissingTiles()).toBe(4);
     });
   });
 });
@@ -114,6 +132,36 @@ describe('TileBag', () => {
       expect(tileBag.getLetter('X')).toBe(1);
       expect(tileBag.getLetter('Y')).toBe(2);
       expect(tileBag.getLetter('Z')).toBe(1);
+    });
+  });
+
+  describe('Random tile draws', () => {
+    describe('drawRandomTile', () => {
+      it('should return a random tile and decrement the count', () => {
+        const tileBag = new TileBag();
+        tileBag.drawRandomTile();
+        expect(tileBag.tileCount).toBe(99);
+      });
+    });
+
+    describe('drawRandomVowel', () => {
+      it('should return a vowel', () => {
+        for (let i = 0; i < 20; i++) {
+          const tileBag = new TileBag();
+          const tile = tileBag.drawRandomVowel();
+          expect('AEIOU').toContain(Object.keys(tile)[0]);
+        }
+      });
+    });
+
+    describe('drawRandomConsonant', () => {
+      it('should return a vowel', () => {
+        for (let i = 0; i < 20; i++) {
+          const tileBag = new TileBag();
+          const tile = tileBag.drawRandomConsonant();
+          expect('AEIOU').not.toContain(Object.keys(tile)[0]);
+        }
+      });
     });
   });
 });
