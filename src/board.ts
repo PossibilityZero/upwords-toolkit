@@ -152,7 +152,7 @@ class UBFHelper {
   ): string[] {
     const [x, y] = coord;
     const lineStart: Coord = direction === PlayDirection.Horizontal ? [x, 0] : [0, y];
-    const lineOfPlay = [];
+    const lineOfPlay: string[] = [];
     for (let i = 0; i < UBFHelper.boardLength; i++) {
       lineOfPlay.push(UBFHelper.getTileAt(board, UBFHelper.offsetCoord(lineStart, direction, i)));
     }
@@ -167,7 +167,7 @@ class UBFHelper {
     const { tiles, start, direction } = play;
     // For each tile placed, find all the words that are formed
     // 1. Find the coordinates of the tiles placed (skip empty tiles)
-    const playCoordinates = [];
+    const playCoordinates: Coord[] = [];
     for (let i = 0; i < tiles.length; i++) {
       if (tiles[i] !== ' ') {
         playCoordinates.push(UBFHelper.offsetCoord(start, direction, i));
@@ -175,7 +175,7 @@ class UBFHelper {
     }
     // 2. For each tile, find the words that it touches in the new board state
     const newBoardState = UBFHelper.placeTiles(board, play);
-    const words = [];
+    const words: BoardWord[] = [];
     // Start with the direction of play (only one word)
     words.push(this.findWord(newBoardState, playCoordinates[0]!, direction));
     // Find words in the orthogonal direction
@@ -206,7 +206,7 @@ class UBFHelper {
   }
 
   static findWord(board: IUpwordsBoardFormat, coord: Coord, direction: PlayDirection): BoardWord {
-    const word = [];
+    const word: BoardCell[] = [];
     const [x, y] = coord;
     // Find the start of the word
     let i;
@@ -239,7 +239,7 @@ class UBFHelper {
     const { tiles, start, direction } = play;
     // For each tile placed, find all the words that are formed
     // 1. Find the coordinates of the tiles placed (skip empty tiles)
-    const playCoordinates = [];
+    const playCoordinates: Coord[] = [];
     for (let i = 0; i < tiles.length; i++) {
       if (tiles[i] !== ' ') {
         playCoordinates.push(UBFHelper.offsetCoord(start, direction, i));
@@ -247,7 +247,7 @@ class UBFHelper {
     }
     // 2. For each tile, find the words that it touches in the new board state
     const newBoardState = UBFHelper.placeTiles(board, play);
-    const words = [];
+    const words: BoardWord[] = [];
     // Start with the direction of play (only one word)
     words.push(this.findWord(newBoardState, playCoordinates[0]!, direction));
     // Find words in the orthogonal direction
