@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import { Trie } from '@kamilmielnik/trie';
 
 interface IUpwordsPlay {
   tiles: string;
@@ -264,6 +265,14 @@ interface IPlayValidationResult {
   error: MoveErrorCode;
 }
 class IllegalPlay {
+  static validWordsTrie: Trie;
+  static {
+    const validWords = fs
+      .readFileSync(path.resolve(__dirname, '../data/dictionary.txt'), 'utf8')
+      .split('\n')
+      .filter((word) => word.length >= 2);
+    this.validWordsTrie = Trie.fromArray(validWords);
+  }
   static playOutOfBounds(play: IUpwordsPlay): IPlayValidationResult {
     let isIllegal = false;
     const { tiles, start, direction } = play;
@@ -315,7 +324,7 @@ class IllegalPlay {
     }
     let isIllegal = false;
     const { tiles, start, direction } = play;
-    const adjacentCoords = [];
+    const adjacentCoords: Coord[] = [];
     // push the coordinates before and after the play
     const beforePlayCoord = UBFHelper.offsetCoord(start, direction, -1);
     const afterPlayCoord = UBFHelper.offsetCoord(start, direction, tiles.length);
@@ -461,9 +470,6 @@ class IllegalPlay {
   }
 
   static wordIsInvalid(board: IUpwordsBoardFormat, play: IUpwordsPlay): IPlayValidationResult {
-    const validWords = fs
-      .readFileSync(path.resolve(__dirname, '../data/dictionary.txt'), 'utf8')
-      .split('\n');
     const words = UBFHelper.getWordsFromPlay(board, play);
     const formedWords = words.map((word) =>
       word
@@ -473,7 +479,7 @@ class IllegalPlay {
         .join('')
     );
     for (const word of formedWords) {
-      if (!validWords.includes(word)) {
+      if (IllegalPlay.validWordsTrie.has(word) === false) {
         return {
           isIllegal: true,
           error: MoveErrorCode.InvalidWord
