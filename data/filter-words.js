@@ -42,7 +42,10 @@ fs.readFile('./twl06.txt', 'utf8', (err, data) => {
   const filteredWords = words.filter((word) => {
     let include = true;
     let reason = 0;
-    if (word.length > 10) {
+    // contract "qu" as one tile
+    const calculateTileLength = (w) => w.length - (w.search(/qu/) > 0 ? 1 : 0);
+    const tileLength = calculateTileLength(word);
+    if (tileLength > 10) {
       reason = 'Too long';
       include = false;
     } else if (word.search(/q[^u]/) >= 0) {
