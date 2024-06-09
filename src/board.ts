@@ -608,8 +608,8 @@ class UpwordsBoard {
   }
 }
 
-export default UpwordsBoard;
 export {
+  UpwordsBoard,
   IUpwordsBoardFormat,
   Coord,
   IUpwordsPlay,

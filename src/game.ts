@@ -1,5 +1,4 @@
-import UpwordsBoard from './board.js';
-import { IUpwordsPlay, IUpwordsBoardFormat } from './board.js';
+import { UpwordsBoard, IUpwordsPlay, IUpwordsBoardFormat } from './board.js';
 import { TileRack, TileBag } from './tiles.js';
 
 class UpwordsGame {
