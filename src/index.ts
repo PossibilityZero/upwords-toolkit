@@ -1,4 +1,4 @@
-import UpwordsGame from './game';
+import UpwordsGame from './game.js';
 
 const UpwordsToolkit = {
   UpwordsGame

@@ -1,20 +1,51 @@
-import UpwordsBoard from './board';
+import UpwordsBoard from './board.js';
+import { IUpwordsPlay, IUpwordsBoardFormat } from './board.js';
+import { TileRack, TileBag } from './tiles.js';
 
 class UpwordsGame {
-  players: number;
+  playerCount: number;
   currentPlayer: number;
-  board: UpwordsBoard;
-  constructor(players = 1) {
-    this.players = players;
-    this.currentPlayer = 1;
+  private board: UpwordsBoard;
+  tileBag: TileBag;
+  private players: { tiles: TileRack; score: number }[] = [];
+
+  constructor(playerCount = 1) {
+    this.playerCount = playerCount;
+    this.currentPlayer = 0;
+    this.tileBag = new TileBag();
+    for (let i = 0; i < playerCount; i++) {
+      this.players.push({ tiles: new TileRack(), score: 0 });
+      // Create a new tile rack for each player
+    }
     this.board = new UpwordsBoard();
   }
 
-  playMove(): void {
-    // Perform the move logic here
+  playMove(play: IUpwordsPlay): void {
+    const playResult = this.board.playTiles(play);
+    if (playResult.isValid) {
+      this.players[this.currentPlayer]!.score += playResult.points!;
+      // Cycle to the next player
+      this.currentPlayer = (this.currentPlayer + 1) % this.playerCount;
+    }
+  }
 
-    // Cycle to the next player
-    this.currentPlayer = (this.currentPlayer % this.players) + 1;
+  getBoard(): IUpwordsBoardFormat {
+    // Return a UBF copy of the board
+    return this.board.getUBF();
+  }
+
+  getTiles(player: number): TileRack {
+    // Return the tiles for the specified player
+    return this.players[player]!.tiles;
+  }
+
+  getTileBag(): TileBag {
+    return this.tileBag;
+  }
+
+  getScore(player: number): number {
+    // Return the score for the specified player
+    return this.players[player]!.score;
   }
 }
 

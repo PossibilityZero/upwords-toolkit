@@ -609,4 +609,12 @@ class UpwordsBoard {
 }
 
 export default UpwordsBoard;
-export { IUpwordsBoardFormat, Coord, IUpwordsPlay, IMoveResult, PlayDirection, MoveErrorCode };
+export {
+  IUpwordsBoardFormat,
+  Coord,
+  IUpwordsPlay,
+  IMoveResult,
+  PlayDirection,
+  MoveErrorCode,
+  UBFHelper
+};
