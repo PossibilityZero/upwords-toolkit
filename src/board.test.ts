@@ -1,5 +1,6 @@
 import { UpwordsBoard } from './board';
 import { IUpwordsPlay, PlayDirection, MoveErrorCode } from './board';
+import { TWL06 } from '../data/wordList.js';
 
 function makePlay(tiles: string, start: [number, number], direction: PlayDirection): IUpwordsPlay {
   return {
@@ -11,7 +12,7 @@ function makePlay(tiles: string, start: [number, number], direction: PlayDirecti
 describe('UpwordsBoard', () => {
   describe('constructor', () => {
     it('should initialize an empty board', () => {
-      const board = new UpwordsBoard();
+      const board = new UpwordsBoard(TWL06);
       expect(board.getUBF()).toEqual([
         ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
         ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
@@ -39,14 +40,14 @@ describe('UpwordsBoard', () => {
         ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
         ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ']
       ];
-      const board = new UpwordsBoard(testUBF);
+      const board = new UpwordsBoard(TWL06, testUBF);
       expect(board.getUBF()).toEqual(testUBF);
     });
   });
 
   describe('playTiles', () => {
     it('should add a word at level 1 when the board is empty and return the UBF', () => {
-      const board = new UpwordsBoard();
+      const board = new UpwordsBoard(TWL06);
       // play the five tiles 'HELLO' from [4, 3] going horizontally
       board.playTiles(makePlay('HELLO', [4, 3], PlayDirection.Horizontal));
       const outputUBF = [
@@ -65,7 +66,7 @@ describe('UpwordsBoard', () => {
     });
 
     it('should handle vertical moves', () => {
-      const board = new UpwordsBoard();
+      const board = new UpwordsBoard(TWL06);
       // play the five tiles 'HELLO' from [2, 5] going vertically
       board.playTiles(makePlay('HELLO', [2, 5], PlayDirection.Vertical));
       const outputUBF = [
@@ -84,7 +85,7 @@ describe('UpwordsBoard', () => {
     });
 
     test('response should contain points scored and validity of the move', () => {
-      const board = new UpwordsBoard();
+      const board = new UpwordsBoard(TWL06);
       // play the five tiles 'HELLO' from [4, 3] going horizontally
       const moveResult = board.playTiles(makePlay('HELLO', [4, 3], PlayDirection.Horizontal));
       expect(moveResult.points).toBeGreaterThan(0);
@@ -92,7 +93,7 @@ describe('UpwordsBoard', () => {
     });
 
     it('should stack tiles on top of existing tiles', () => {
-      const board = new UpwordsBoard();
+      const board = new UpwordsBoard(TWL06);
       // play the five tiles 'HELLO' from [4, 3] going horizontally
       board.playTiles(makePlay('HELLS', [4, 3], PlayDirection.Horizontal));
       // play the five tiles 'WORLD' from [3, 7] going vertically
@@ -113,7 +114,7 @@ describe('UpwordsBoard', () => {
     });
 
     it('should treat spaces as empty tiles', () => {
-      const board = new UpwordsBoard();
+      const board = new UpwordsBoard(TWL06);
       // play the word 'HELLO' from [4, 3] going horizontally
       board.playTiles(makePlay('HELLO', [4, 3], PlayDirection.Horizontal));
       // play the word 'FOLLOW' from [3, 7] going vertically
@@ -136,7 +137,7 @@ describe('UpwordsBoard', () => {
 
     describe('validation', () => {
       it('should reject plays that put words out of bounds', () => {
-        const board = new UpwordsBoard();
+        const board = new UpwordsBoard(TWL06);
         // play the word 'HELLO' from [5, 3] going horizontally
         board.playTiles(makePlay('HELLO', [5, 3], PlayDirection.Horizontal));
         // attempt to play the word 'LONGEST' from [5, 5] going vertically
@@ -168,7 +169,7 @@ describe('UpwordsBoard', () => {
           ['0 ', '0 ', '0 ', '1L', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
           ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ']
         ];
-        const board = new UpwordsBoard(initialUBF);
+        const board = new UpwordsBoard(TWL06, initialUBF);
         // try to make the word 'TEAM' from [4, 3] going horizontally
         // should fail because the 'A' would be stacked on an 'S' of height 5
         const moveResult = board.playTiles(makePlay('AM', [4, 5], PlayDirection.Horizontal));
@@ -177,7 +178,7 @@ describe('UpwordsBoard', () => {
       });
 
       it("should reject plays that don't connect to any existing tiles", () => {
-        const board = new UpwordsBoard();
+        const board = new UpwordsBoard(TWL06);
         board.playTiles(makePlay('HELLO', [4, 3], PlayDirection.Horizontal));
         // try to make the word 'WORLD' from [5, 2] going vertically,
         // so that the 'W' is diagonal from the 'H' in 'HELLO'
@@ -199,7 +200,7 @@ describe('UpwordsBoard', () => {
           ['0 ', '0 ', '0 ', '0 ', '1P', '1R', '1A', '1W', '1N', '0 '],
           ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ']
         ];
-        const board = new UpwordsBoard(initialUBF);
+        const board = new UpwordsBoard(TWL06, initialUBF);
         // Try to play 'HEN' and 'UP' from [3, 4] going vertically
         // This uses the 'E' in 'HELLO' and the 'P' in 'PRAWN',
         // but there is a gap between the two words.
@@ -214,7 +215,7 @@ describe('UpwordsBoard', () => {
       });
 
       it('should reject plays that stack the same tile on top of itself', () => {
-        const board = new UpwordsBoard();
+        const board = new UpwordsBoard(TWL06);
         // play the five tiles 'HELLO' from [4, 3] going horizontally
         board.playTiles(makePlay('HELLO', [4, 3], PlayDirection.Horizontal));
         // try to play the word 'WORLD' from [1, 5] going vertically
@@ -225,7 +226,7 @@ describe('UpwordsBoard', () => {
       });
 
       it('should reject plays that completely cover existing words', () => {
-        const board = new UpwordsBoard();
+        const board = new UpwordsBoard(TWL06);
         // play the five tiles 'HELLO' from [4, 3] going horizontally
         board.playTiles(makePlay('HELLO', [4, 3], PlayDirection.Horizontal));
         // try to play the word 'WORLD' from [4, 3] going horizontally
@@ -236,7 +237,7 @@ describe('UpwordsBoard', () => {
       });
 
       it('should reject first play that does not cover the four center squares', () => {
-        const board = new UpwordsBoard();
+        const board = new UpwordsBoard(TWL06);
         // try to play the word 'HELLO' from [3, 3] going horizontally
         // this should fail because it does not cover the four center squares
         const moveResult1 = board.playTiles(makePlay('HELLO', [3, 3], PlayDirection.Horizontal));
@@ -275,7 +276,7 @@ describe('UpwordsBoard', () => {
             ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
             ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ']
           ];
-          const board = new UpwordsBoard(initialUBF);
+          const board = new UpwordsBoard(TWL06, initialUBF);
           // vertical: CARE -> CARES
           const moveResult1 = board.playTiles(makePlay('S', [6, 5], PlayDirection.Vertical));
           expect(moveResult1.isValid).toBe(false);
@@ -304,7 +305,7 @@ describe('UpwordsBoard', () => {
             ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
             ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ']
           ];
-          const board = new UpwordsBoard(initialUBF);
+          const board = new UpwordsBoard(TWL06, initialUBF);
           // HIS -> HISS
           const moveResult = board.playTiles(makePlay('S', [4, 6], PlayDirection.Horizontal));
           expect(moveResult.isValid).toBe(true);
@@ -323,7 +324,7 @@ describe('UpwordsBoard', () => {
             ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
             ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ']
           ];
-          const board = new UpwordsBoard(initialUBF);
+          const board = new UpwordsBoard(TWL06, initialUBF);
           // Adding single S to the start of a word
           const moveResult1 = board.playTiles(makePlay('S', [4, 2], PlayDirection.Vertical));
           expect(moveResult1.isValid).toBe(true);
@@ -345,7 +346,7 @@ describe('UpwordsBoard', () => {
             ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
             ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ']
           ];
-          const board = new UpwordsBoard(initialUBF);
+          const board = new UpwordsBoard(TWL06, initialUBF);
           // Horizontally, "HISS" makes this safe
           const moveResult = board.playTiles(makePlay('S', [4, 6], PlayDirection.Horizontal));
           expect(moveResult.isValid).toBe(true);
@@ -355,14 +356,14 @@ describe('UpwordsBoard', () => {
 
     describe('word checking', () => {
       it('should reject words that are not in the dictionary', () => {
-        const board = new UpwordsBoard();
+        const board = new UpwordsBoard(TWL06);
         const moveResult = board.playTiles(makePlay('SSPACE', [4, 3], PlayDirection.Horizontal));
         expect(moveResult.isValid).toBe(false);
         expect(moveResult.error).toBe(MoveErrorCode.InvalidWord);
       });
 
       it('should treat "Q" as "Qu" for spelling', () => {
-        const board = new UpwordsBoard();
+        const board = new UpwordsBoard(TWL06);
         // play the word 'QUICK' from [4, 3] going horizontally
         const moveResult = board.playTiles(makePlay('QICK', [4, 3], PlayDirection.Horizontal));
         expect(moveResult.isValid).toBe(true);
@@ -372,7 +373,7 @@ describe('UpwordsBoard', () => {
     describe('scoring', () => {
       // Tests:
       it('should score double for words of all 1 height', () => {
-        const board = new UpwordsBoard();
+        const board = new UpwordsBoard(TWL06);
         // play the word 'TESTING' from [4, 1] going horizontally
         const moveResult = board.playTiles(makePlay('TEST', [4, 1], PlayDirection.Horizontal));
         expect(moveResult.points).toBe(8);
@@ -391,7 +392,7 @@ describe('UpwordsBoard', () => {
           ['0 ', '0 ', '0 ', '0 ', '0 ', '1N', '0 ', '1Y', '1O', '0 '],
           ['0 ', '0 ', '0 ', '0 ', '0 ', '1G', '0 ', '0 ', '1X', '0 ']
         ];
-        const board = new UpwordsBoard(initialUBF);
+        const board = new UpwordsBoard(TWL06, initialUBF);
         // play the word 'MODAL' from [7, 4] going horizontally
         // First letter is omitted because it is already on the board
         const moveResult = board.playTiles(makePlay('OD L', [7, 5], PlayDirection.Horizontal));
@@ -412,7 +413,7 @@ describe('UpwordsBoard', () => {
           ['0 ', '0 ', '0 ', '3A', '0 ', '1S', '3W', '2I', '2M', '0 '],
           ['1B', '1I', '1K', '1E', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ']
         ];
-        const board = new UpwordsBoard(initialUBF);
+        const board = new UpwordsBoard(TWL06, initialUBF);
         // play the word 'CINDERS' from [2, 9] going vertically
         const moveResult = board.playTiles(makePlay('CINDERS', [2, 9], PlayDirection.Vertical));
         expect(moveResult.points).toBe(43);
@@ -437,7 +438,7 @@ describe('UpwordsBoard', () => {
           ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
           ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ']
         ];
-        const board = new UpwordsBoard(initialUBF);
+        const board = new UpwordsBoard(TWL06, initialUBF);
         // Place the letters "LIO" to form the word "LION" from [4, 2] going horizontally
         const moveResult = board.playTiles(makePlay('LIO', [4, 2], PlayDirection.Horizontal));
         // This move should be valid, because no whole word is covered
@@ -457,7 +458,7 @@ describe('UpwordsBoard', () => {
           ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
           ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ']
         ];
-        const board = new UpwordsBoard(initialUBF);
+        const board = new UpwordsBoard(TWL06, initialUBF);
         // Horizontally, "HISS" makes this safe
         const moveResult = board.playTiles(makePlay('S', [4, 6], PlayDirection.Horizontal));
         expect(moveResult.isValid).toBe(true);
@@ -468,7 +469,7 @@ describe('UpwordsBoard', () => {
   describe('Play History', () => {
     describe('getPreviousMove', () => {
       it('should contain points scored and validity of the previous move', () => {
-        const board = new UpwordsBoard();
+        const board = new UpwordsBoard(TWL06);
         // play the five tiles 'HELLO' from [4, 3] going horizontally
         board.playTiles(makePlay('HELLO', [4, 3], PlayDirection.Horizontal));
         const moveResult = board.getPreviousMove();

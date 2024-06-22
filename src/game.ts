@@ -1,5 +1,6 @@
 import { UpwordsBoard, IUpwordsPlay, IUpwordsBoardFormat } from './board.js';
 import { TileRack, TileBag } from './tiles.js';
+import { TWL06 } from '../data/wordList.js';
 
 class UpwordsGame {
   playerCount: number;
@@ -16,7 +17,7 @@ class UpwordsGame {
       this.players.push({ tiles: new TileRack(), score: 0 });
       // Create a new tile rack for each player
     }
-    this.board = new UpwordsBoard();
+    this.board = new UpwordsBoard(TWL06);
   }
 
   playMove(play: IUpwordsPlay): void {

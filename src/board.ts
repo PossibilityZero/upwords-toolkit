@@ -1,5 +1,3 @@
-import fs from 'fs';
-import path from 'path';
 import { Trie } from '@kamilmielnik/trie';
 
 interface IUpwordsPlay {
@@ -266,13 +264,11 @@ interface IPlayValidationResult {
 }
 class IllegalPlay {
   static validWordsTrie: Trie;
-  static {
-    const validWords = fs
-      .readFileSync(path.resolve(__dirname, '../data/dictionary.txt'), 'utf8')
-      .split('\n')
-      .filter((word) => word.length >= 2);
+  static init(wordList: string[]): void {
+    const validWords = wordList.filter((word) => word.length >= 2);
     this.validWordsTrie = Trie.fromArray(validWords);
   }
+
   static playOutOfBounds(play: IUpwordsPlay): IPlayValidationResult {
     let isIllegal = false;
     const { tiles, start, direction } = play;
@@ -546,13 +542,15 @@ class UpwordsBoard {
     IllegalPlay.onlyAddsPlural
   ];
 
-  constructor(initialUBF?: IUpwordsBoardFormat) {
+  constructor(wordList: string[], initialUBF?: IUpwordsBoardFormat) {
     this.moveHistory = [];
     if (initialUBF) {
       this.ubfBoard = initialUBF;
     } else {
       this.ubfBoard = UBFHelper.createEmptyBoard();
     }
+
+    IllegalPlay.init(wordList);
   }
 
   getUBF(): IUpwordsBoardFormat {
