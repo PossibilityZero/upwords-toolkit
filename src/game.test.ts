@@ -1,6 +1,5 @@
 import UpwordsGame from './game';
-import { IUpwordsPlay, PlayDirection } from './board';
-import { UBFHelper } from './board';
+import { IUpwordsPlay, PlayDirection, UBFHelper } from './boardUtils';
 
 describe('UpwordsGame', () => {
   const defaultStarterMove: IUpwordsPlay = {
