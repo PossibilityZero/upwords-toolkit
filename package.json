@@ -1,7 +1,7 @@
 {
   "name": "upwords-toolkit",
-  "version": "1.0.0",
-  "description": "",
+  "version": "0.1",
+  "description": "Collection of tools for the Upwords board game",
   "main": "index.js",
   "type": "module",
   "scripts": {

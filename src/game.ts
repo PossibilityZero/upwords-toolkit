@@ -49,4 +49,4 @@ class UpwordsGame {
   }
 }
 
-export default UpwordsGame;
+export { UpwordsGame };

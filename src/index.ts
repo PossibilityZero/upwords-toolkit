@@ -1,7 +1,5 @@
-import UpwordsGame from './game.js';
+import { UpwordsGame } from './game.js';
+import { UpwordsBoard } from './board.js';
+import { UBFHelper } from './boardUtils.js';
 
-const UpwordsToolkit = {
-  UpwordsGame
-};
-
-export default UpwordsToolkit;
+export { UpwordsGame, UpwordsBoard, UBFHelper };

@@ -1,4 +1,4 @@
-import UpwordsGame from './game';
+import { UpwordsGame } from './game';
 import { IUpwordsPlay, PlayDirection, UBFHelper } from './boardUtils';
 
 describe('UpwordsGame', () => {
