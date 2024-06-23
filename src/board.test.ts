@@ -511,6 +511,27 @@ describe('UpwordsBoard', () => {
     });
   });
 
+  describe('checkPlay', () => {
+    it('should have isValid=true if the play is valid', () => {
+      const board = new UpwordsBoard(testWordList);
+      const result = board.checkPlay(makePlay('HELLO', [4, 3], PlayDirection.Horizontal));
+      expect(result.isValid).toBe(true);
+    });
+
+    it('should have isValid=false if the play is invalid', () => {
+      const board = new UpwordsBoard(testWordList);
+      const result = board.checkPlay(makePlay('HELLO', [7, 3], PlayDirection.Horizontal));
+      expect(result.isValid).toBe(false);
+    });
+
+    it('should not modify the board', () => {
+      const board = new UpwordsBoard(testWordList);
+      const initialUBF = board.getUBF();
+      board.checkPlay(makePlay('HELLO', [4, 3], PlayDirection.Horizontal));
+      expect(board.getUBF()).toEqual(initialUBF);
+    });
+  });
+
   describe('Play History', () => {
     describe('getPreviousMove', () => {
       it('should contain points scored and validity of the previous move', () => {

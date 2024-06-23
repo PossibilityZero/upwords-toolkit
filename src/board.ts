@@ -342,20 +342,26 @@ class UpwordsBoard {
     return { isValid: true };
   }
 
-  playTiles(play: IUpwordsPlay): IMoveResult {
+  playTiles(play: IUpwordsPlay, checkOnly: boolean = false): IMoveResult {
     const validation = this.#validatePlay(play);
     if (!validation.isValid) {
       return validation;
     }
     // Play is valid, calculate points and update the board
     const points = UBFHelper.scorePlay(this.ubfBoard, play);
-    this.ubfBoard = UBFHelper.placeTiles(this.ubfBoard, play);
     const moveResult = {
       points,
       isValid: true
     };
-    this.moveHistory.push(moveResult);
+    if (!checkOnly) {
+      this.ubfBoard = UBFHelper.placeTiles(this.ubfBoard, play);
+      this.moveHistory.push(moveResult);
+    }
     return moveResult;
+  }
+
+  checkPlay(play: IUpwordsPlay): IMoveResult {
+    return this.playTiles(play, true);
   }
 
   getPreviousMove(numberOfMovesBack = 1): IMoveResult {
