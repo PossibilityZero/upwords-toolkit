@@ -16,7 +16,7 @@ enum PlayDirection {
   Vertical
 }
 
-export { IUpwordsPlay, IUpwordsBoardFormat, Coord, PlayDirection };
+export { IUpwordsPlay, IUpwordsBoardFormat, Coord, PlayDirection, BoardWord, BoardCell };
 
 class UBFHelper {
   /* No public method in the class mutates the board.

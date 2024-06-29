@@ -192,4 +192,3 @@ class TileBag extends TileSet {
 }
 
 export { TileSet, TileRack, TileBag };
-export default { TileSet, TileRack, TileBag };

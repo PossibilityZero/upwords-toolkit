@@ -1,9 +1,16 @@
 {
   "name": "upwords-toolkit",
-  "version": "0.1",
+  "version": "0.1.0",
   "description": "Collection of tools for the Upwords board game",
-  "main": "index.js",
+  "main": "dist/src/index.js",
+  "types": "dist/types/src/index.d.ts",
   "type": "module",
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md",
+    "package.json"
+  ],
   "scripts": {
     "test": "jest -o",
     "test-watch": "jest --watchAll",
@@ -21,7 +28,7 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/PossibilityZero/upwords-toolkit/issues"
   },
