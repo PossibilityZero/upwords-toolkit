@@ -82,6 +82,24 @@ class UBFHelper {
     throw new Error('Invalid direction');
   }
 
+  static getAdjacentCoords(coord: Coord): Coord[] {
+    const [x, y] = coord;
+    const adjacents: Coord[] = [];
+    adjacents.push([x - 1, y], [x + 1, y], [x, y - 1], [x, y + 1]);
+    return adjacents.filter((c) => c.every((i) => i >= 0 && i < UBFHelper.boardLength));
+  }
+
+  static getAdjacentTiles(board: IUpwordsBoardFormat, coord: Coord): BoardCell[] {
+    const adjacents = this.getAdjacentCoords(coord);
+    return adjacents.map((c) => {
+      return {
+        letter: this.getLetterAt(board, c),
+        coord: c,
+        height: this.getHeightAt(board, c)
+      };
+    });
+  }
+
   static getOrthogonalDirection(direction: PlayDirection): PlayDirection {
     return direction === PlayDirection.Horizontal
       ? PlayDirection.Vertical

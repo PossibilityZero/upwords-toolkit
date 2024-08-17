@@ -117,6 +117,43 @@ describe('UBFHelper', () => {
     });
   });
 
+  describe('getAdjacentCoords', () => {
+    it('should return the coords adjacent to the given coord', () => {
+      const adjacents = UBFHelper.getAdjacentCoords([4, 4]);
+      expect(adjacents).toEqual(
+        expect.arrayContaining([
+          [3, 4],
+          [4, 3],
+          [4, 5],
+          [5, 4]
+        ])
+      );
+    });
+
+    it('should only return coords on the board when given a square on the edge', () => {
+      const adjacents = UBFHelper.getAdjacentCoords([0, 0]);
+      expect(adjacents).toEqual(
+        expect.arrayContaining([
+          [0, 1],
+          [1, 0]
+        ])
+      );
+      expect(adjacents).not.toEqual(
+        expect.arrayContaining([
+          [-1, 0],
+          [0, -1]
+        ])
+      );
+    });
+  });
+
+  describe('getAdjacentTiles', () => {
+    it('should return the tiles adjacent to the given coord', () => {
+      const adjacents = UBFHelper.getAdjacentTiles(testUBF1, [4, 6]);
+      expect(adjacents.map((cell) => cell.letter)).toEqual(expect.arrayContaining(['L', 'O']));
+    });
+  });
+
   describe('placeSingleTile', () => {
     it('should place a single tile at the specified coord', () => {
       const newBoard = UBFHelper.placeSingleTile(testUBF1, 'A', [4, 4]);
