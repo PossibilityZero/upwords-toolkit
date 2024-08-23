@@ -58,6 +58,8 @@ type FullTiles = {
     | 'Z']: number;
 };
 
+type Letter = keyof FullTiles;
+
 class TileSet {
   protected tiles: FullTiles;
 
@@ -82,7 +84,7 @@ class TileSet {
       .map(([letter]) => letter);
   }
 
-  public addTile(letter: keyof FullTiles, count: number): void {
+  public addTile(letter: Letter, count: number): void {
     this.tiles[letter] += count;
   }
 
@@ -92,26 +94,26 @@ class TileSet {
     });
   }
 
-  public removeTile(letter: keyof FullTiles, count: number): Tiles {
+  public removeTile(letter: Letter, count: number): Tiles {
     this.tiles[letter] -= count;
     return { [letter]: count };
   }
 
   public removeTiles(letters: Tiles): void {
     Object.entries(letters).forEach(([letter, count]) => {
-      this.removeTile(letter as keyof FullTiles, count);
+      this.removeTile(letter as Letter, count);
     });
   }
 
   public setTiles(letters: Tiles): void {
     Object.entries(letters).forEach(([letter, count]) => {
-      this.tiles[letter as keyof FullTiles] = count;
+      this.tiles[letter as Letter] = count;
     });
   }
 
   public deleteAllTiles(): void {
     Object.keys(this.tiles).forEach((letter) => {
-      this.tiles[letter as keyof FullTiles] = 0;
+      this.tiles[letter as Letter] = 0;
     });
   }
 }
@@ -172,7 +174,7 @@ class TileBag extends TileSet {
       ''
     );
     const randomIndex = Math.floor(Math.random() * allTiles.length);
-    const randomLetter = allTiles[randomIndex] as keyof FullTiles;
+    const randomLetter = allTiles[randomIndex] as Letter;
     return this.removeTile(randomLetter, 1);
   }
 
@@ -182,7 +184,7 @@ class TileBag extends TileSet {
       return combined.concat(letter[0].repeat(count));
     }, '');
     const randomIndex = Math.floor(Math.random() * allVowels.length);
-    const randomVowel = allVowels[randomIndex] as keyof FullTiles;
+    const randomVowel = allVowels[randomIndex] as Letter;
     return this.removeTile(randomVowel, 1);
   }
 
@@ -192,9 +194,10 @@ class TileBag extends TileSet {
       return combined.concat(letter[0].repeat(count));
     }, '');
     const randomIndex = Math.floor(Math.random() * allVowels.length);
-    const randomVowel = allVowels[randomIndex] as keyof FullTiles;
+    const randomVowel = allVowels[randomIndex] as Letter;
     return this.removeTile(randomVowel, 1);
   }
 }
 
 export { TileSet, TileRack, TileBag };
+export { Letter, Tiles, FullTiles };

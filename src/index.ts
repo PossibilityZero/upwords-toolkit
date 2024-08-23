@@ -14,5 +14,16 @@ import {
   BoardWord,
   BoardCell
 } from './boardUtils.js';
+import { Letter, Tiles, FullTiles } from './tiles.js';
 
-export { IUpwordsPlay, IUpwordsBoardFormat, Coord, PlayDirection, BoardWord, BoardCell };
+export {
+  IUpwordsPlay,
+  IUpwordsBoardFormat,
+  Coord,
+  PlayDirection,
+  BoardWord,
+  BoardCell,
+  Letter,
+  Tiles,
+  FullTiles
+};
