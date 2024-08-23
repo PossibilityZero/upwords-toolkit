@@ -78,10 +78,10 @@ class TileSet {
     return this.tiles[letter];
   }
 
-  public listLetters(): string[] {
+  public listLetters(): Letter[] {
     return Object.entries(this.tiles)
       .filter(([, count]) => count > 0)
-      .map(([letter]) => letter);
+      .map(([letter]) => letter as Letter);
   }
 
   public addTile(letter: Letter, count: number): void {
