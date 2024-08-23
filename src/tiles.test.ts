@@ -16,6 +16,14 @@ describe('TileSet', () => {
     });
   });
 
+  describe('listLetters', () => {
+    it('should return a list of all letters with a count greater than 0', () => {
+      const newTileSet = new TileSet();
+      newTileSet.addTiles({ A: 1, B: 0, C: 3 });
+      expect(newTileSet.listLetters()).toEqual(expect.arrayContaining(['A', 'C']));
+    });
+  });
+
   describe('addTile', () => {
     it('should increment the count of the given letter', () => {
       const newTileSet = new TileSet();

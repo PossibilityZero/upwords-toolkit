@@ -76,6 +76,12 @@ class TileSet {
     return this.tiles[letter];
   }
 
+  public listLetters(): string[] {
+    return Object.entries(this.tiles)
+      .filter(([, count]) => count > 0)
+      .map(([letter]) => letter);
+  }
+
   public addTile(letter: keyof FullTiles, count: number): void {
     this.tiles[letter] += count;
   }
