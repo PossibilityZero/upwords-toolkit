@@ -82,6 +82,10 @@ class UBFHelper {
     throw new Error('Invalid direction');
   }
 
+  static coordsAreEqual(coord1: Coord, coord2: Coord): boolean {
+    return coord1[0] === coord2[0] && coord1[1] === coord2[1];
+  }
+
   static getAdjacentCoords(coord: Coord): Coord[] {
     const [x, y] = coord;
     const adjacents: Coord[] = [];

@@ -106,6 +106,16 @@ describe('UBFHelper', () => {
     });
   });
 
+  describe('coordsAreEqual', () => {
+    it('should return true if two coords are equal', () => {
+      expect(UBFHelper.coordsAreEqual([4, 3], [4, 3])).toBe(true);
+    });
+
+    it('should return false if two coords are not equal', () => {
+      expect(UBFHelper.coordsAreEqual([4, 3], [3, 4])).toBe(false);
+    });
+  });
+
   describe('getOrthogonalDirection', () => {
     it('should return the orthogonal direction', () => {
       expect(UBFHelper.getOrthogonalDirection(PlayDirection.Horizontal)).toBe(
