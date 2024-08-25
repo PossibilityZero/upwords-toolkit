@@ -133,6 +133,12 @@ class TileRack extends TileSet {
   public getMissingTiles(): number {
     return this.tileCountTarget - this.tileCount;
   }
+
+  public copyToNewRack(): TileRack {
+    const newRack = new TileRack();
+    newRack.setTiles(this.tiles);
+    return newRack;
+  }
 }
 
 class TileBag extends TileSet {

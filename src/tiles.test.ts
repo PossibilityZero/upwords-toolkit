@@ -103,6 +103,17 @@ describe('TileRack', () => {
       expect(playerRack.getMissingTiles()).toBe(4);
     });
   });
+
+  describe('copyToNewRack', () => {
+    it('should copy the tiles to a new rack and remove them from the original rack', () => {
+      const playerRack = new TileRack();
+      playerRack.setTiles({ A: 1, D: 1, E: 1 });
+      const newRack = playerRack.copyToNewRack();
+      expect(playerRack.tileCount).toBe(3);
+      expect(newRack.tileCount).toBe(3);
+      expect(newRack).not.toBe(playerRack);
+    });
+  });
 });
 
 describe('TileBag', () => {
