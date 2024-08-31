@@ -167,6 +167,14 @@ class UBFHelper {
     return adjacents.filter((c) => c.every((i) => i >= 0 && i < UBFHelper.boardLength));
   }
 
+  /**
+   * Returns an array of BoardCell objects that are adjacent to the given
+   * coordinate in the vertical and horizontal directions.
+   *
+   * @param coord The coordinate to find adjacent coordinates for
+   * @returns An array of BoardCell objects that are adjacent to the given coordinate.
+   * Excludes out-of-bounds coordinates.
+   */
   static getAdjacentCells(board: IUpwordsBoardFormat, coord: Coord): BoardCell[] {
     const adjacents = this.getAdjacentCoords(coord);
     return adjacents.map((c) => {
