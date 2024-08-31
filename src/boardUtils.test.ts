@@ -237,6 +237,11 @@ describe('UBFHelper', () => {
         { letter: 'S', height: 3, coord: [6, 3] }
       ]);
     });
+
+    it('should return an empty array if the coord has no tile placed on it', () => {
+      const word = UBFHelper.findWord(testUBF2, [5, 6], PlayDirection.Horizontal);
+      expect(word).toHaveLength(0);
+    });
   });
 
   describe('getWordsFromPlay', () => {

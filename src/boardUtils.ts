@@ -1,16 +1,29 @@
+/**
+ * Represents a single play on the Upwords board.
+ * Properties: tiles, start, direction
+ */
 interface IUpwordsPlay {
   tiles: string;
   start: Coord;
   direction: PlayDirection;
 }
-type IUpwordsBoardFormat = string[][];
-type Coord = [number, number];
+/**
+ * Represents a single cell on the Upwords board.
+ * Properties: letter, coord, height
+ */
 interface BoardCell {
   letter: string;
   coord: Coord;
   height: number;
 }
+type IUpwordsBoardFormat = string[][];
+type Coord = [number, number];
 type BoardWord = BoardCell[];
+/**
+ * Represents the direction of a play on the Upwords board.
+ *
+ * Valid values are Horizontal and Vertical.
+ */
 enum PlayDirection {
   Horizontal,
   Vertical
@@ -18,11 +31,19 @@ enum PlayDirection {
 
 export { IUpwordsPlay, IUpwordsBoardFormat, Coord, PlayDirection, BoardWord, BoardCell };
 
+/**
+ * A collection of static methods to help with Upwords board operations.
+ *
+ * No public method in the class mutates the board.
+ * Instead, a new copy is created for each operation.
+ */
 class UBFHelper {
-  /* No public method in the class mutates the board.
-   * Instead, a new copy is created for each operation.
-   */
   static boardLength = 10;
+  /**
+   * Creates an empty Upwords board.
+   *
+   * @returns An empty 10 x 10 Upwords board
+   */
   static createEmptyBoard(): IUpwordsBoardFormat {
     return [
       ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
@@ -38,11 +59,25 @@ class UBFHelper {
     ];
   }
 
+  /**
+   * Creates a new IUpwordsBoardFormat that is a deep copy of the input board.
+   *
+   * @param board The board to copy
+   * @returns A deep copy of the input board
+   */
   static copyBoard(board: IUpwordsBoardFormat): IUpwordsBoardFormat {
     // Tiles are strings and are immutable, so this is a deep copy
     return board.map((row) => row.map((tile) => tile));
   }
 
+  /**
+   * Returns the tile at the given coordinate on the board.
+   * Throws an error if the coordinate is out of bounds.
+   *
+   * @param board The board to search
+   * @param coord The coordinate to look up
+   * @returns A string representing the tile, in the format 'height letter'. eg. '2T'
+   */
   static getTileAt(board: IUpwordsBoardFormat, coord: Coord): string {
     const [x, y] = coord;
     const boardRow = board[x];
@@ -56,6 +91,14 @@ class UBFHelper {
     return tile;
   }
 
+  /**
+   * Returns the height of the tile at the given coordinate on the board.
+   * Throws an error if the tile does not exist.
+   *
+   * @param board The board to search
+   * @param coord The coordinate to look up
+   * @returns The height of the tile at the given coordinate
+   */
   static getHeightAt(board: IUpwordsBoardFormat, coord: Coord): number {
     const height = this.getTileAt(board, coord)[0];
     if (!height) {
@@ -64,6 +107,14 @@ class UBFHelper {
     return parseInt(height);
   }
 
+  /**
+   * Returns the letter of the tile at the given coordinate on the board.
+   * Throws an error if the tile does not exist.
+   *
+   * @param board The board to search
+   * @param coord The coordinate to look up
+   * @returns The letter of the tile at the given coordinate
+   */
   static getLetterAt(board: IUpwordsBoardFormat, coord: Coord): string {
     const letter = this.getTileAt(board, coord)[1];
     if (!letter) {
@@ -72,6 +123,14 @@ class UBFHelper {
     return letter;
   }
 
+  /**
+   * Returns a new Coord that is offset from the start Coord in the given direction.
+   *
+   * @param start The starting point coordinate
+   * @param direction The direction to offset the coordinate
+   * @param offset The distance to offset the coordinate
+   * @returns A new coordinate that is offset by the given amount in the given direction
+   */
   static offsetCoord(start: Coord, direction: PlayDirection, offset: number): Coord {
     const [x, y] = start;
     if (direction === PlayDirection.Horizontal) {
@@ -82,10 +141,25 @@ class UBFHelper {
     throw new Error('Invalid direction');
   }
 
+  /**
+   * Compares two coordinates and returns true if they are equal.
+   *
+   * @param coord1 The first coordinate
+   * @param coord2 The second coordinate
+   * @returns true if coord1 and coord2 have the same x and y values
+   */
   static coordsAreEqual(coord1: Coord, coord2: Coord): boolean {
     return coord1[0] === coord2[0] && coord1[1] === coord2[1];
   }
 
+  /**
+   * Returns an array of coordinates that are adjacent to the given
+   * coordinate in the vertical and horizontal directions.
+   *
+   * @param coord The coordinate to find adjacent coordinates for
+   * @returns An array of coordinates that are adjacent to the given coordinate.
+   * Excludes out-of-bounds coordinates.
+   */
   static getAdjacentCoords(coord: Coord): Coord[] {
     const [x, y] = coord;
     const adjacents: Coord[] = [];
@@ -104,12 +178,31 @@ class UBFHelper {
     });
   }
 
+  /**
+   * Returns the orthogonal direction to the given direction.
+   *
+   * ```
+   * getOrthogonalDirection(PlayDirection.Horizontal); // PlayDirection.Vertical
+   * getOrthogonalDirection(PlayDirection.Vertical); // PlayDirection.Horizontal
+   * ```
+   *
+   * @param direction The input PlayDirection
+   * @returns The orthogonal PlayDirection
+   */
   static getOrthogonalDirection(direction: PlayDirection): PlayDirection {
     return direction === PlayDirection.Horizontal
       ? PlayDirection.Vertical
       : PlayDirection.Horizontal;
   }
 
+  /**
+   * Places a single tile on the board at the given coordinate.
+   *
+   * @param board The current board state
+   * @param letter The letter to place on the board.
+   * @param coordinate The coordinate to start from
+   * @returns A new board state with the tile placed
+   */
   static placeSingleTile(
     board: IUpwordsBoardFormat,
     letter: string,
@@ -127,6 +220,11 @@ class UBFHelper {
     return newBoard;
   }
 
+  /**
+   * Places a single tile on a board, mutating the board in place.
+   * This method is private and is not part of the public API.
+   * Useful for speeding up operations that require multiple tile placements.
+   */
   static #placeTileMutate(board: IUpwordsBoardFormat, letter: string, coordinate: Coord): void {
     const [x, y] = coordinate;
     const [currentHeight, currentLetter] = this.getTileAt(board, [x, y]).split('');
@@ -138,6 +236,13 @@ class UBFHelper {
     }
   }
 
+  /**
+   * Places multiple tiles on the board given a play.
+   *
+   * @param board The current board state
+   * @param play The play to place on the board
+   * @returns A new board state with the tiles placed
+   */
   static placeTiles(board: IUpwordsBoardFormat, play: IUpwordsPlay): IUpwordsBoardFormat {
     const { tiles, start, direction } = play;
     const newBoard = UBFHelper.copyBoard(board);
@@ -149,6 +254,21 @@ class UBFHelper {
     return newBoard;
   }
 
+  /**
+   * Given a board state, coordinate, and a direction,
+   * returns the row or column of the board as an array of tile strings.
+   *
+   * Example:
+   * ```
+   * getLineOfPlay(board, [4, 5], PlayDirection.Horizontal);
+   * // ['0 ', '0 ', '2H', '1E', '3L', '1L', '1O', '0 ', '0 ', '0 ']
+   * ```
+   *
+   * @param board The current board state
+   * @param coord The coordinate to start from
+   * @param direction The direction to get the line of play
+   * @returns An array of strings representing the line of play
+   */
   static getLineOfPlay(
     board: IUpwordsBoardFormat,
     coord: Coord,
@@ -163,10 +283,25 @@ class UBFHelper {
     return lineOfPlay;
   }
 
+  /**
+   * Returns true if the board is empty.
+   * An empty board is one where all tiles are '0 '.
+   *
+   * @param board The board to check
+   * @returns true if the board is empty
+   */
   static boardIsEmpty(board: IUpwordsBoardFormat): boolean {
     return board.every((row) => row.every((cell) => cell === '0 '));
   }
 
+  /**
+   * Given a board and a play, returns the score of the play.
+   * Doesn't check if the play is valid.
+   *
+   * @param board The current board state
+   * @param play The play to score
+   * @returns The score of the play
+   */
   static scorePlay(board: IUpwordsBoardFormat, play: IUpwordsPlay): number {
     const { tiles, start, direction } = play;
     // For each tile placed, find all the words that are formed
@@ -209,9 +344,24 @@ class UBFHelper {
     return score;
   }
 
+  /**
+   * Given a coordinate on the board and a direction, finds the word that the coordinate is part of.
+   *
+   * As opposed to the scoring rules, findWord allows for 1-letter "words".
+   *
+   * If the starting coordinate is empty, returns an empty array.
+   *
+   * @param board The current board state
+   * @param coord The coordinate to start from
+   * @param direction The direction to search for the word
+   * @returns An array of BoardCell objects representing the word
+   */
   static findWord(board: IUpwordsBoardFormat, coord: Coord, direction: PlayDirection): BoardWord {
     const word: BoardCell[] = [];
     const [x, y] = coord;
+    if (this.getHeightAt(board, coord) === 0) {
+      return word;
+    }
     // Find the start of the word
     let i;
     const pos = direction === PlayDirection.Horizontal ? y : x;
@@ -239,6 +389,13 @@ class UBFHelper {
     return word;
   }
 
+  /**
+   * Returns the words formed by a play on the board.
+   *
+   * @param board The current board state
+   * @param play The play onto the board, from which to find all words formed
+   * @returns An array of words formed by the play
+   */
   static getWordsFromPlay(board: IUpwordsBoardFormat, play: IUpwordsPlay): BoardWord[] {
     const { tiles, start, direction } = play;
     // For each tile placed, find all the words that are formed

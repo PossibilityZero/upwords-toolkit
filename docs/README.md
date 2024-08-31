@@ -1,3 +1,7 @@
+**upwords-toolkit** • [**Docs**](globals.md)
+
+***
+
 # upwords-toolkit
 
 ## Todo list
@@ -9,7 +13,3 @@
 ### Functionality
 
 - Provide helper functions for calculations regarding the Upwords mobile game.
-
-## Documentation
-
-See [docs](docs/README.md)
