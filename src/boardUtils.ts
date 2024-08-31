@@ -167,7 +167,7 @@ class UBFHelper {
     return adjacents.filter((c) => c.every((i) => i >= 0 && i < UBFHelper.boardLength));
   }
 
-  static getAdjacentTiles(board: IUpwordsBoardFormat, coord: Coord): BoardCell[] {
+  static getAdjacentCells(board: IUpwordsBoardFormat, coord: Coord): BoardCell[] {
     const adjacents = this.getAdjacentCoords(coord);
     return adjacents.map((c) => {
       return {

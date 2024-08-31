@@ -157,9 +157,9 @@ describe('UBFHelper', () => {
     });
   });
 
-  describe('getAdjacentTiles', () => {
+  describe('getAdjacentCells', () => {
     it('should return the tiles adjacent to the given coord', () => {
-      const adjacents = UBFHelper.getAdjacentTiles(testUBF1, [4, 6]);
+      const adjacents = UBFHelper.getAdjacentCells(testUBF1, [4, 6]);
       expect(adjacents.map((cell) => cell.letter)).toEqual(expect.arrayContaining(['L', 'O']));
     });
   });
