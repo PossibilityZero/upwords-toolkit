@@ -7,7 +7,7 @@ export { UpwordsGame, UpwordsBoard, UBFHelper, TileSet, TileRack, TileBag };
 
 // types
 import {
-  IUpwordsPlay,
+  UpwordsPlay,
   IUpwordsBoardFormat,
   Coord,
   PlayDirection,
@@ -17,7 +17,7 @@ import {
 import { Letter, Tiles, FullTiles } from './tiles.js';
 
 export {
-  IUpwordsPlay,
+  UpwordsPlay,
   IUpwordsBoardFormat,
   Coord,
   PlayDirection,

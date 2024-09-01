@@ -1,13 +1,13 @@
 import { UpwordsGame } from './game';
-import { IUpwordsPlay, PlayDirection, UBFHelper } from './boardUtils';
+import { UpwordsPlay, PlayDirection, UBFHelper } from './boardUtils';
 
 describe('UpwordsGame', () => {
-  const defaultStarterMove: IUpwordsPlay = {
+  const defaultStarterMove: UpwordsPlay = {
     tiles: 'HELLO',
     start: [4, 3],
     direction: PlayDirection.Horizontal
   };
-  const defaultSecondMove: IUpwordsPlay = {
+  const defaultSecondMove: UpwordsPlay = {
     tiles: 'W RLD',
     start: [3, 7],
     direction: PlayDirection.Vertical
@@ -48,7 +48,7 @@ describe('UpwordsGame', () => {
   });
 
   describe('playMove', () => {
-    it('should take an IUpwordsPlay', () => {
+    it('should take an UpwordsPlay', () => {
       const game = new UpwordsGame();
       game.playMove(defaultStarterMove);
     });

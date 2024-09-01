@@ -2,7 +2,7 @@
  * Represents a single play on the Upwords board.
  * Properties: tiles, start, direction
  */
-type IUpwordsPlay = {
+type UpwordsPlay = {
   tiles: string;
   start: Coord;
   direction: PlayDirection;
@@ -30,7 +30,7 @@ enum PlayDirection {
   Vertical
 }
 
-export { IUpwordsPlay, IUpwordsBoardFormat, Coord, PlayDirection, BoardWord, BoardCell };
+export { UpwordsPlay, IUpwordsBoardFormat, Coord, PlayDirection, BoardWord, BoardCell };
 
 /**
  * A collection of static methods to help with Upwords board operations.
@@ -252,7 +252,7 @@ class UBFHelper {
    * @param play The play to place on the board
    * @returns A new board state with the tiles placed
    */
-  static placeTiles(board: IUpwordsBoardFormat, play: IUpwordsPlay): IUpwordsBoardFormat {
+  static placeTiles(board: IUpwordsBoardFormat, play: UpwordsPlay): IUpwordsBoardFormat {
     const { tiles, start, direction } = play;
     const newBoard = UBFHelper.copyBoard(board);
     let i = 0;
@@ -311,7 +311,7 @@ class UBFHelper {
    * @param play The play to score
    * @returns The score of the play
    */
-  static scorePlay(board: IUpwordsBoardFormat, play: IUpwordsPlay): number {
+  static scorePlay(board: IUpwordsBoardFormat, play: UpwordsPlay): number {
     const { tiles, start, direction } = play;
     // For each tile placed, find all the words that are formed
     // 1. Find the coordinates of the tiles placed (skip empty tiles)
@@ -405,7 +405,7 @@ class UBFHelper {
    * @param play The play onto the board, from which to find all words formed
    * @returns An array of words formed by the play
    */
-  static getWordsFromPlay(board: IUpwordsBoardFormat, play: IUpwordsPlay): BoardWord[] {
+  static getWordsFromPlay(board: IUpwordsBoardFormat, play: UpwordsPlay): BoardWord[] {
     const { tiles, start, direction } = play;
     // For each tile placed, find all the words that are formed
     // 1. Find the coordinates of the tiles placed (skip empty tiles)

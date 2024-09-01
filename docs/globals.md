@@ -24,6 +24,6 @@
 - [Coord](type-aliases/Coord.md)
 - [FullTiles](type-aliases/FullTiles.md)
 - [IUpwordsBoardFormat](type-aliases/IUpwordsBoardFormat.md)
-- [IUpwordsPlay](type-aliases/IUpwordsPlay.md)
 - [Letter](type-aliases/Letter.md)
 - [Tiles](type-aliases/Tiles.md)
+- [UpwordsPlay](type-aliases/UpwordsPlay.md)

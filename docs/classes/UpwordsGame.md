@@ -22,7 +22,7 @@
 
 #### Defined in
 
-[game.ts:12](https://github.com/PossibilityZero/upwords-toolkit/blob/c6c9d661206a414e2b4431125278dd2fd913bcc5/src/game.ts#L12)
+[game.ts:12](https://github.com/PossibilityZero/upwords-toolkit/blob/88bd741b283b4e85f6340d5666373c00631373bd/src/game.ts#L12)
 
 ## Properties
 
@@ -32,7 +32,7 @@
 
 #### Defined in
 
-[game.ts:7](https://github.com/PossibilityZero/upwords-toolkit/blob/c6c9d661206a414e2b4431125278dd2fd913bcc5/src/game.ts#L7)
+[game.ts:7](https://github.com/PossibilityZero/upwords-toolkit/blob/88bd741b283b4e85f6340d5666373c00631373bd/src/game.ts#L7)
 
 ***
 
@@ -42,7 +42,7 @@
 
 #### Defined in
 
-[game.ts:6](https://github.com/PossibilityZero/upwords-toolkit/blob/c6c9d661206a414e2b4431125278dd2fd913bcc5/src/game.ts#L6)
+[game.ts:6](https://github.com/PossibilityZero/upwords-toolkit/blob/88bd741b283b4e85f6340d5666373c00631373bd/src/game.ts#L6)
 
 ***
 
@@ -52,7 +52,7 @@
 
 #### Defined in
 
-[game.ts:9](https://github.com/PossibilityZero/upwords-toolkit/blob/c6c9d661206a414e2b4431125278dd2fd913bcc5/src/game.ts#L9)
+[game.ts:9](https://github.com/PossibilityZero/upwords-toolkit/blob/88bd741b283b4e85f6340d5666373c00631373bd/src/game.ts#L9)
 
 ## Methods
 
@@ -66,7 +66,7 @@
 
 #### Defined in
 
-[game.ts:32](https://github.com/PossibilityZero/upwords-toolkit/blob/c6c9d661206a414e2b4431125278dd2fd913bcc5/src/game.ts#L32)
+[game.ts:32](https://github.com/PossibilityZero/upwords-toolkit/blob/88bd741b283b4e85f6340d5666373c00631373bd/src/game.ts#L32)
 
 ***
 
@@ -84,7 +84,7 @@
 
 #### Defined in
 
-[game.ts:46](https://github.com/PossibilityZero/upwords-toolkit/blob/c6c9d661206a414e2b4431125278dd2fd913bcc5/src/game.ts#L46)
+[game.ts:46](https://github.com/PossibilityZero/upwords-toolkit/blob/88bd741b283b4e85f6340d5666373c00631373bd/src/game.ts#L46)
 
 ***
 
@@ -98,7 +98,7 @@
 
 #### Defined in
 
-[game.ts:42](https://github.com/PossibilityZero/upwords-toolkit/blob/c6c9d661206a414e2b4431125278dd2fd913bcc5/src/game.ts#L42)
+[game.ts:42](https://github.com/PossibilityZero/upwords-toolkit/blob/88bd741b283b4e85f6340d5666373c00631373bd/src/game.ts#L42)
 
 ***
 
@@ -116,7 +116,7 @@
 
 #### Defined in
 
-[game.ts:37](https://github.com/PossibilityZero/upwords-toolkit/blob/c6c9d661206a414e2b4431125278dd2fd913bcc5/src/game.ts#L37)
+[game.ts:37](https://github.com/PossibilityZero/upwords-toolkit/blob/88bd741b283b4e85f6340d5666373c00631373bd/src/game.ts#L37)
 
 ***
 
@@ -126,7 +126,7 @@
 
 #### Parameters
 
-• **play**: [`IUpwordsPlay`](../type-aliases/IUpwordsPlay.md)
+• **play**: [`UpwordsPlay`](../type-aliases/UpwordsPlay.md)
 
 #### Returns
 
@@ -134,4 +134,4 @@
 
 #### Defined in
 
-[game.ts:23](https://github.com/PossibilityZero/upwords-toolkit/blob/c6c9d661206a414e2b4431125278dd2fd913bcc5/src/game.ts#L23)
+[game.ts:23](https://github.com/PossibilityZero/upwords-toolkit/blob/88bd741b283b4e85f6340d5666373c00631373bd/src/game.ts#L23)

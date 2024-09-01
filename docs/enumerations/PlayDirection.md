@@ -18,7 +18,7 @@ Valid values are Horizontal and Vertical.
 
 #### Defined in
 
-[boardUtils.ts:29](https://github.com/PossibilityZero/upwords-toolkit/blob/c6c9d661206a414e2b4431125278dd2fd913bcc5/src/boardUtils.ts#L29)
+[boardUtils.ts:29](https://github.com/PossibilityZero/upwords-toolkit/blob/88bd741b283b4e85f6340d5666373c00631373bd/src/boardUtils.ts#L29)
 
 ***
 
@@ -28,4 +28,4 @@ Valid values are Horizontal and Vertical.
 
 #### Defined in
 
-[boardUtils.ts:30](https://github.com/PossibilityZero/upwords-toolkit/blob/c6c9d661206a414e2b4431125278dd2fd913bcc5/src/boardUtils.ts#L30)
+[boardUtils.ts:30](https://github.com/PossibilityZero/upwords-toolkit/blob/88bd741b283b4e85f6340d5666373c00631373bd/src/boardUtils.ts#L30)

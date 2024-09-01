@@ -1,4 +1,4 @@
-import { UpwordsBoard, IUpwordsPlay, IUpwordsBoardFormat } from './board.js';
+import { UpwordsBoard, UpwordsPlay, IUpwordsBoardFormat } from './board.js';
 import { TileRack, TileBag } from './tiles.js';
 import { TWL06 } from '../data/wordList.js';
 
@@ -20,7 +20,7 @@ class UpwordsGame {
     this.board = new UpwordsBoard(TWL06);
   }
 
-  playMove(play: IUpwordsPlay): void {
+  playMove(play: UpwordsPlay): void {
     const playResult = this.board.playTiles(play);
     if (playResult.isValid) {
       this.players[this.currentPlayer]!.score += playResult.points!;

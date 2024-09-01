@@ -1,5 +1,5 @@
 import { UBFHelper } from './boardUtils';
-import { PlayDirection, IUpwordsPlay } from './board';
+import { PlayDirection, UpwordsPlay } from './board';
 
 describe('UBFHelper', () => {
   const emptyTestUBF = [
@@ -173,7 +173,7 @@ describe('UBFHelper', () => {
 
   describe('placeTiles', () => {
     it('should place tiles according to the given play', () => {
-      const play: IUpwordsPlay = {
+      const play: UpwordsPlay = {
         tiles: ' IN',
         start: [3, 7],
         direction: PlayDirection.Horizontal
@@ -248,7 +248,7 @@ describe('UBFHelper', () => {
     it('should return all words formed by the given play', () => {
       // play "MASS" from [6, 0] horizontally
       // form the words "MASS" and "HOODS"
-      const play: IUpwordsPlay = {
+      const play: UpwordsPlay = {
         tiles: 'M S',
         start: [6, 0],
         direction: PlayDirection.Horizontal
@@ -279,7 +279,7 @@ describe('UBFHelper', () => {
     it('should return the score of the given play', () => {
       // play "MASS" from [6, 0] horizontally
       // form the words "MASS" and "HOODS"
-      const play: IUpwordsPlay = {
+      const play: UpwordsPlay = {
         tiles: 'M S',
         start: [6, 0],
         direction: PlayDirection.Horizontal
@@ -289,7 +289,7 @@ describe('UBFHelper', () => {
     });
 
     it('should add a bonus of 20 points for using all 7 tiles', () => {
-      const play: IUpwordsPlay = {
+      const play: UpwordsPlay = {
         tiles: 'CINDERS',
         start: [2, 9],
         direction: PlayDirection.Vertical

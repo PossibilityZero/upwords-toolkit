@@ -1,6 +1,6 @@
 import { Trie } from '@kamilmielnik/trie';
 import { UBFHelper } from './boardUtils.js';
-import { IUpwordsPlay, IUpwordsBoardFormat, Coord, PlayDirection } from './boardUtils.js';
+import { UpwordsPlay, IUpwordsBoardFormat, Coord, PlayDirection } from './boardUtils.js';
 
 type IMoveResult = {
   isValid: boolean;
@@ -32,7 +32,7 @@ class IllegalPlay {
     this.validWordsTrie = Trie.fromArray(validWords);
   }
 
-  static playOutOfBounds(play: IUpwordsPlay): IPlayValidationResult {
+  static playOutOfBounds(play: UpwordsPlay): IPlayValidationResult {
     let isIllegal = false;
     const { tiles, start, direction } = play;
     const length = tiles.trimEnd().length;
@@ -49,7 +49,7 @@ class IllegalPlay {
 
   static firstPlayDoesNotCoverCenter(
     board: IUpwordsBoardFormat,
-    play: IUpwordsPlay
+    play: UpwordsPlay
   ): IPlayValidationResult {
     const newBoardState = UBFHelper.placeTiles(board, play);
     // Check whether one of [4, 4], [4, 5], [5, 4], [5, 5] is covered
@@ -72,7 +72,7 @@ class IllegalPlay {
     };
   }
 
-  static playIsIsolated(board: IUpwordsBoardFormat, play: IUpwordsPlay): IPlayValidationResult {
+  static playIsIsolated(board: IUpwordsBoardFormat, play: UpwordsPlay): IPlayValidationResult {
     function coordIsInBounds(coord: Coord): boolean {
       const [x, y] = coord;
       return x >= 0 && x <= 9 && y >= 0 && y <= 9;
@@ -106,7 +106,7 @@ class IllegalPlay {
     };
   }
 
-  static sameTileStacked(board: IUpwordsBoardFormat, play: IUpwordsPlay): IPlayValidationResult {
+  static sameTileStacked(board: IUpwordsBoardFormat, play: UpwordsPlay): IPlayValidationResult {
     let isIllegal = false;
     const { tiles, start, direction } = play;
     for (let i = 0; i < tiles.length; i++) {
@@ -122,7 +122,7 @@ class IllegalPlay {
     };
   }
 
-  static playHasGap(board: IUpwordsBoardFormat, play: IUpwordsPlay): IPlayValidationResult {
+  static playHasGap(board: IUpwordsBoardFormat, play: UpwordsPlay): IPlayValidationResult {
     let isIllegal = false;
     const { tiles, start, direction } = play;
     const boardAfterPlay = UBFHelper.placeTiles(board, play);
@@ -139,7 +139,7 @@ class IllegalPlay {
     };
   }
 
-  static coversExistingWord(board: IUpwordsBoardFormat, play: IUpwordsPlay): IPlayValidationResult {
+  static coversExistingWord(board: IUpwordsBoardFormat, play: UpwordsPlay): IPlayValidationResult {
     let isIllegal = false;
     const { tiles, start, direction } = play;
     const lineOfPlay = UBFHelper.getLineOfPlay(board, start, direction);
@@ -218,7 +218,7 @@ class IllegalPlay {
     };
   }
 
-  static exceedsHeightLimit(board: IUpwordsBoardFormat, play: IUpwordsPlay): IPlayValidationResult {
+  static exceedsHeightLimit(board: IUpwordsBoardFormat, play: UpwordsPlay): IPlayValidationResult {
     let isIllegal = false;
     const newBoardState = UBFHelper.placeTiles(board, play);
     isIllegal = newBoardState.some((row) => row.some((tile) => tile[0]! > '5'));
@@ -228,7 +228,7 @@ class IllegalPlay {
     };
   }
 
-  static wordIsInvalid(board: IUpwordsBoardFormat, play: IUpwordsPlay): IPlayValidationResult {
+  static wordIsInvalid(board: IUpwordsBoardFormat, play: UpwordsPlay): IPlayValidationResult {
     const words = UBFHelper.getWordsFromPlay(board, play);
     const formedWords = words.map((word) =>
       word
@@ -251,7 +251,7 @@ class IllegalPlay {
     };
   }
 
-  static onlyAddsPlural(board: IUpwordsBoardFormat, play: IUpwordsPlay): IPlayValidationResult {
+  static onlyAddsPlural(board: IUpwordsBoardFormat, play: UpwordsPlay): IPlayValidationResult {
     let isIllegal = false;
     // Only check if the play is a single S
     checkPluralConditions: if (play.tiles.trim() === 'S') {
@@ -320,7 +320,7 @@ class UpwordsBoard {
     return UBFHelper.copyBoard(this.ubfBoard);
   }
 
-  #validatePlay(play: IUpwordsPlay): IMoveResult {
+  #validatePlay(play: UpwordsPlay): IMoveResult {
     // Check: Play validations
     for (const validation of UpwordsBoard.playValidations) {
       const result = validation(play);
@@ -344,7 +344,7 @@ class UpwordsBoard {
     return { isValid: true };
   }
 
-  playTiles(play: IUpwordsPlay, checkOnly: boolean = false): IMoveResult {
+  playTiles(play: UpwordsPlay, checkOnly: boolean = false): IMoveResult {
     const validation = this.#validatePlay(play);
     if (!validation.isValid) {
       return validation;
@@ -362,7 +362,7 @@ class UpwordsBoard {
     return moveResult;
   }
 
-  checkPlay(play: IUpwordsPlay): IMoveResult {
+  checkPlay(play: UpwordsPlay): IMoveResult {
     return this.playTiles(play, true);
   }
 
@@ -379,7 +379,7 @@ export {
   UpwordsBoard,
   IUpwordsBoardFormat,
   Coord,
-  IUpwordsPlay,
+  UpwordsPlay,
   IMoveResult,
   PlayDirection,
   MoveErrorCode

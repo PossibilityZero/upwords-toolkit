@@ -1,7 +1,7 @@
 import { UpwordsBoard } from './board';
-import { IUpwordsPlay, PlayDirection, MoveErrorCode } from './board';
+import { UpwordsPlay, PlayDirection, MoveErrorCode } from './board';
 
-function makePlay(tiles: string, start: [number, number], direction: PlayDirection): IUpwordsPlay {
+function makePlay(tiles: string, start: [number, number], direction: PlayDirection): UpwordsPlay {
   return {
     tiles,
     start,
