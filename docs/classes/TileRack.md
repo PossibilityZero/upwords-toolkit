@@ -26,7 +26,7 @@
 
 #### Defined in
 
-[tiles.ts:124](https://github.com/PossibilityZero/upwords-toolkit/blob/2744cc267ac0331cbdb84fe8b6ecb1e227425c44/src/tiles.ts#L124)
+[tiles.ts:124](https://github.com/PossibilityZero/upwords-toolkit/blob/c6c9d661206a414e2b4431125278dd2fd913bcc5/src/tiles.ts#L124)
 
 ## Properties
 
@@ -40,7 +40,7 @@
 
 #### Defined in
 
-[tiles.ts:64](https://github.com/PossibilityZero/upwords-toolkit/blob/2744cc267ac0331cbdb84fe8b6ecb1e227425c44/src/tiles.ts#L64)
+[tiles.ts:64](https://github.com/PossibilityZero/upwords-toolkit/blob/c6c9d661206a414e2b4431125278dd2fd913bcc5/src/tiles.ts#L64)
 
 ## Accessors
 
@@ -58,7 +58,7 @@
 
 #### Defined in
 
-[tiles.ts:73](https://github.com/PossibilityZero/upwords-toolkit/blob/2744cc267ac0331cbdb84fe8b6ecb1e227425c44/src/tiles.ts#L73)
+[tiles.ts:73](https://github.com/PossibilityZero/upwords-toolkit/blob/c6c9d661206a414e2b4431125278dd2fd913bcc5/src/tiles.ts#L73)
 
 ***
 
@@ -72,7 +72,7 @@
 
 #### Defined in
 
-[tiles.ts:129](https://github.com/PossibilityZero/upwords-toolkit/blob/2744cc267ac0331cbdb84fe8b6ecb1e227425c44/src/tiles.ts#L129)
+[tiles.ts:129](https://github.com/PossibilityZero/upwords-toolkit/blob/c6c9d661206a414e2b4431125278dd2fd913bcc5/src/tiles.ts#L129)
 
 ## Methods
 
@@ -96,7 +96,7 @@
 
 #### Defined in
 
-[tiles.ts:87](https://github.com/PossibilityZero/upwords-toolkit/blob/2744cc267ac0331cbdb84fe8b6ecb1e227425c44/src/tiles.ts#L87)
+[tiles.ts:87](https://github.com/PossibilityZero/upwords-toolkit/blob/c6c9d661206a414e2b4431125278dd2fd913bcc5/src/tiles.ts#L87)
 
 ***
 
@@ -118,7 +118,7 @@
 
 #### Defined in
 
-[tiles.ts:91](https://github.com/PossibilityZero/upwords-toolkit/blob/2744cc267ac0331cbdb84fe8b6ecb1e227425c44/src/tiles.ts#L91)
+[tiles.ts:91](https://github.com/PossibilityZero/upwords-toolkit/blob/c6c9d661206a414e2b4431125278dd2fd913bcc5/src/tiles.ts#L91)
 
 ***
 
@@ -132,7 +132,7 @@
 
 #### Defined in
 
-[tiles.ts:137](https://github.com/PossibilityZero/upwords-toolkit/blob/2744cc267ac0331cbdb84fe8b6ecb1e227425c44/src/tiles.ts#L137)
+[tiles.ts:137](https://github.com/PossibilityZero/upwords-toolkit/blob/c6c9d661206a414e2b4431125278dd2fd913bcc5/src/tiles.ts#L137)
 
 ***
 
@@ -150,7 +150,7 @@
 
 #### Defined in
 
-[tiles.ts:114](https://github.com/PossibilityZero/upwords-toolkit/blob/2744cc267ac0331cbdb84fe8b6ecb1e227425c44/src/tiles.ts#L114)
+[tiles.ts:114](https://github.com/PossibilityZero/upwords-toolkit/blob/c6c9d661206a414e2b4431125278dd2fd913bcc5/src/tiles.ts#L114)
 
 ***
 
@@ -172,7 +172,7 @@
 
 #### Defined in
 
-[tiles.ts:77](https://github.com/PossibilityZero/upwords-toolkit/blob/2744cc267ac0331cbdb84fe8b6ecb1e227425c44/src/tiles.ts#L77)
+[tiles.ts:77](https://github.com/PossibilityZero/upwords-toolkit/blob/c6c9d661206a414e2b4431125278dd2fd913bcc5/src/tiles.ts#L77)
 
 ***
 
@@ -186,7 +186,7 @@
 
 #### Defined in
 
-[tiles.ts:133](https://github.com/PossibilityZero/upwords-toolkit/blob/2744cc267ac0331cbdb84fe8b6ecb1e227425c44/src/tiles.ts#L133)
+[tiles.ts:133](https://github.com/PossibilityZero/upwords-toolkit/blob/c6c9d661206a414e2b4431125278dd2fd913bcc5/src/tiles.ts#L133)
 
 ***
 
@@ -204,7 +204,7 @@
 
 #### Defined in
 
-[tiles.ts:81](https://github.com/PossibilityZero/upwords-toolkit/blob/2744cc267ac0331cbdb84fe8b6ecb1e227425c44/src/tiles.ts#L81)
+[tiles.ts:81](https://github.com/PossibilityZero/upwords-toolkit/blob/c6c9d661206a414e2b4431125278dd2fd913bcc5/src/tiles.ts#L81)
 
 ***
 
@@ -228,7 +228,7 @@
 
 #### Defined in
 
-[tiles.ts:97](https://github.com/PossibilityZero/upwords-toolkit/blob/2744cc267ac0331cbdb84fe8b6ecb1e227425c44/src/tiles.ts#L97)
+[tiles.ts:97](https://github.com/PossibilityZero/upwords-toolkit/blob/c6c9d661206a414e2b4431125278dd2fd913bcc5/src/tiles.ts#L97)
 
 ***
 
@@ -250,7 +250,7 @@
 
 #### Defined in
 
-[tiles.ts:102](https://github.com/PossibilityZero/upwords-toolkit/blob/2744cc267ac0331cbdb84fe8b6ecb1e227425c44/src/tiles.ts#L102)
+[tiles.ts:102](https://github.com/PossibilityZero/upwords-toolkit/blob/c6c9d661206a414e2b4431125278dd2fd913bcc5/src/tiles.ts#L102)
 
 ***
 
@@ -272,4 +272,4 @@
 
 #### Defined in
 
-[tiles.ts:108](https://github.com/PossibilityZero/upwords-toolkit/blob/2744cc267ac0331cbdb84fe8b6ecb1e227425c44/src/tiles.ts#L108)
+[tiles.ts:108](https://github.com/PossibilityZero/upwords-toolkit/blob/c6c9d661206a414e2b4431125278dd2fd913bcc5/src/tiles.ts#L108)

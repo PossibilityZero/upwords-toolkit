@@ -10,4 +10,4 @@
 
 ## Defined in
 
-[boardUtils.ts:20](https://github.com/PossibilityZero/upwords-toolkit/blob/2744cc267ac0331cbdb84fe8b6ecb1e227425c44/src/boardUtils.ts#L20)
+[boardUtils.ts:21](https://github.com/PossibilityZero/upwords-toolkit/blob/c6c9d661206a414e2b4431125278dd2fd913bcc5/src/boardUtils.ts#L21)

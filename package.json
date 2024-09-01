@@ -20,7 +20,8 @@
     "lint": "eslint . --ext .ts",
     "prettier-format": "prettier --config .prettierrc 'src/**/*' --write",
     "prettier-check": "prettier --config .prettierrc 'src/**/*' --check",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "generate-docs": "typedoc --out docs src/index.ts --plugin typedoc-plugin-markdown"
   },
   "repository": {
     "type": "git",

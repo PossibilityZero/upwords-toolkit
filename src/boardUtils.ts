@@ -2,20 +2,21 @@
  * Represents a single play on the Upwords board.
  * Properties: tiles, start, direction
  */
-interface IUpwordsPlay {
+type IUpwordsPlay = {
   tiles: string;
   start: Coord;
   direction: PlayDirection;
-}
+};
+
 /**
  * Represents a single cell on the Upwords board.
  * Properties: letter, coord, height
  */
-interface BoardCell {
+type BoardCell = {
   letter: string;
   coord: Coord;
   height: number;
-}
+};
 type IUpwordsBoardFormat = string[][];
 type Coord = [number, number];
 type BoardWord = BoardCell[];

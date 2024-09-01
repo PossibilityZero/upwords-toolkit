@@ -17,16 +17,13 @@
 - [UpwordsBoard](classes/UpwordsBoard.md)
 - [UpwordsGame](classes/UpwordsGame.md)
 
-## Interfaces
-
-- [BoardCell](interfaces/BoardCell.md)
-- [IUpwordsPlay](interfaces/IUpwordsPlay.md)
-
 ## Type Aliases
 
+- [BoardCell](type-aliases/BoardCell.md)
 - [BoardWord](type-aliases/BoardWord.md)
 - [Coord](type-aliases/Coord.md)
 - [FullTiles](type-aliases/FullTiles.md)
 - [IUpwordsBoardFormat](type-aliases/IUpwordsBoardFormat.md)
+- [IUpwordsPlay](type-aliases/IUpwordsPlay.md)
 - [Letter](type-aliases/Letter.md)
 - [Tiles](type-aliases/Tiles.md)

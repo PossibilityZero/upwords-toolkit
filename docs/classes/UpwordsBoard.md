@@ -24,7 +24,7 @@
 
 #### Defined in
 
-[board.ts:306](https://github.com/PossibilityZero/upwords-toolkit/blob/2744cc267ac0331cbdb84fe8b6ecb1e227425c44/src/board.ts#L306)
+[board.ts:308](https://github.com/PossibilityZero/upwords-toolkit/blob/c6c9d661206a414e2b4431125278dd2fd913bcc5/src/board.ts#L308)
 
 ## Methods
 
@@ -34,7 +34,7 @@
 
 #### Parameters
 
-• **play**: [`IUpwordsPlay`](../interfaces/IUpwordsPlay.md)
+• **play**: [`IUpwordsPlay`](../type-aliases/IUpwordsPlay.md)
 
 #### Returns
 
@@ -42,7 +42,7 @@
 
 #### Defined in
 
-[board.ts:363](https://github.com/PossibilityZero/upwords-toolkit/blob/2744cc267ac0331cbdb84fe8b6ecb1e227425c44/src/board.ts#L363)
+[board.ts:365](https://github.com/PossibilityZero/upwords-toolkit/blob/c6c9d661206a414e2b4431125278dd2fd913bcc5/src/board.ts#L365)
 
 ***
 
@@ -60,7 +60,7 @@
 
 #### Defined in
 
-[board.ts:367](https://github.com/PossibilityZero/upwords-toolkit/blob/2744cc267ac0331cbdb84fe8b6ecb1e227425c44/src/board.ts#L367)
+[board.ts:369](https://github.com/PossibilityZero/upwords-toolkit/blob/c6c9d661206a414e2b4431125278dd2fd913bcc5/src/board.ts#L369)
 
 ***
 
@@ -74,7 +74,7 @@
 
 #### Defined in
 
-[board.ts:317](https://github.com/PossibilityZero/upwords-toolkit/blob/2744cc267ac0331cbdb84fe8b6ecb1e227425c44/src/board.ts#L317)
+[board.ts:319](https://github.com/PossibilityZero/upwords-toolkit/blob/c6c9d661206a414e2b4431125278dd2fd913bcc5/src/board.ts#L319)
 
 ***
 
@@ -84,7 +84,7 @@
 
 #### Parameters
 
-• **play**: [`IUpwordsPlay`](../interfaces/IUpwordsPlay.md)
+• **play**: [`IUpwordsPlay`](../type-aliases/IUpwordsPlay.md)
 
 • **checkOnly**: `boolean` = `false`
 
@@ -94,4 +94,4 @@
 
 #### Defined in
 
-[board.ts:345](https://github.com/PossibilityZero/upwords-toolkit/blob/2744cc267ac0331cbdb84fe8b6ecb1e227425c44/src/board.ts#L345)
+[board.ts:347](https://github.com/PossibilityZero/upwords-toolkit/blob/c6c9d661206a414e2b4431125278dd2fd913bcc5/src/board.ts#L347)

@@ -2,11 +2,12 @@ import { Trie } from '@kamilmielnik/trie';
 import { UBFHelper } from './boardUtils.js';
 import { IUpwordsPlay, IUpwordsBoardFormat, Coord, PlayDirection } from './boardUtils.js';
 
-interface IMoveResult {
+type IMoveResult = {
   isValid: boolean;
   points?: number;
   error?: MoveErrorCode;
-}
+};
+
 enum MoveErrorCode {
   OutOfBounds,
   HeightLimitExceeded,
@@ -19,10 +20,11 @@ enum MoveErrorCode {
   OnlyPluralizesWord
 }
 
-interface IPlayValidationResult {
+type IPlayValidationResult = {
   isIllegal: boolean;
   error: MoveErrorCode;
-}
+};
+
 class IllegalPlay {
   static validWordsTrie: Trie;
   static init(wordList: string[]): void {
