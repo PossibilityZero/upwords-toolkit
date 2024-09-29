@@ -24,6 +24,14 @@ describe('TileSet', () => {
     });
   });
 
+  describe('listTiles', () => {
+    it('should return a string representing each tile once', () => {
+      const newTileSet = new TileSet();
+      newTileSet.addTiles({ T: 2, E: 1, S: 1 });
+      expect(newTileSet.listTiles()).toEqual('ESTT');
+    });
+  });
+
   describe('addTile', () => {
     it('should increment the count of the given letter', () => {
       const newTileSet = new TileSet();
