@@ -304,6 +304,35 @@ class UBFHelper {
   }
 
   /**
+   * Given a single board word (array of BoardCells), calculates the score of the word.
+   * * 1 point for each tile height in the word
+   * * Double base score if all tiles are height 1
+   * * +2 points if the word contains the "Qu" tile and all tiles are height 1
+   *
+   * @param word The word to calculate the score for
+   * @returns The score of the word
+   */
+  static calculateWordScore(word: BoardWord): number {
+    let hasQuTile = false;
+    let isAllOneHeight = true;
+    let score = 0;
+    for (const cell of word) {
+      score += cell.height;
+      hasQuTile = hasQuTile || cell.letter === 'Q';
+      isAllOneHeight = isAllOneHeight && cell.height === 1;
+    }
+    if (isAllOneHeight) {
+      // double bonus for all tiles being height 1
+      score *= 2;
+      if (hasQuTile) {
+        // +2 points for using the "Qu" tile in a 1-height word
+        score += 2;
+      }
+    }
+    return score;
+  }
+
+  /**
    * Given a board and a play, returns the score of the play.
    * Doesn't check if the play is valid.
    *
@@ -328,8 +357,8 @@ class UBFHelper {
     words.push(this.findWord(newBoardState, playCoordinates[0]!, direction));
     // Find words in the orthogonal direction
     const orthogonal = UBFHelper.getOrthogonalDirection(direction);
-    for (const [x, y] of playCoordinates) {
-      const formedWord = this.findWord(newBoardState, [x, y], orthogonal);
+    for (const coord of playCoordinates) {
+      const formedWord = this.findWord(newBoardState, coord, orthogonal);
       if (formedWord.length >= 2) {
         words.push(formedWord);
       }
@@ -337,14 +366,7 @@ class UBFHelper {
     // 3. For each word, calculate the score and add it to the total
     let score = 0;
     for (const word of words) {
-      // Calculate the score for the word
-      const wordScore = word.reduce((acc, cell) => acc + cell.height, 0);
-      // Double the score if all heights are 1
-      if (word.every((cell) => cell.height === 1)) {
-        score += wordScore * 2;
-      } else {
-        score += wordScore;
-      }
+      score += this.calculateWordScore(word);
     }
     // 4. If all 7 tiles are used, add 20 points to the score
     if (playCoordinates.length === 7) {

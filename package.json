@@ -1,6 +1,6 @@
 {
   "name": "upwords-toolkit",
-  "version": "0.1.15",
+  "version": "0.1.16",
   "description": "Collection of tools for the Upwords board game",
   "main": "dist/src/index.js",
   "types": "dist/types/src/index.d.ts",

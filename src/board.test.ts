@@ -52,7 +52,9 @@ const testWordList = [
   'lad',
   'bone',
   'capes',
-  'valence'
+  'valence',
+  'qit', // "quit"; "Qu" is one tile
+  'qiz' // "quiz"; "Qu" is one tile
 ];
 
 describe('UpwordsBoard', () => {
@@ -520,6 +522,29 @@ describe('UpwordsBoard', () => {
         // Horizontally, "HISS" makes this safe
         const moveResult = board.playTiles(makePlay('S', [4, 6], PlayDirection.Horizontal));
         expect(moveResult.isValid).toBe(true);
+      });
+
+      it('should give 2 bonus points for "Qu" tiles if they are played in a 1-height word', () => {
+        const initialUBF = [
+          ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+          ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+          ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+          ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+          ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+          ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+          ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+          ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+          ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+          ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ']
+        ];
+        const board = new UpwordsBoard(testWordList, initialUBF);
+        // Horizontally, "HISS" makes this safe
+        const moveResult1 = board.playTiles(makePlay('QIT', [4, 4], PlayDirection.Horizontal));
+        expect(moveResult1.isValid).toBe(true);
+        expect(moveResult1.points).toBe(8);
+        const moveResult2 = board.playTiles(makePlay('Z', [4, 6], PlayDirection.Horizontal));
+        expect(moveResult2.isValid).toBe(true);
+        expect(moveResult2.points).toBe(4);
       });
     });
   });
