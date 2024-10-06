@@ -347,7 +347,7 @@ class UBFHelper {
       }
     }
     // 4. If all 7 tiles are used, add 20 points to the score
-    if (tiles.length === 7) {
+    if (playCoordinates.length === 7) {
       score += 20;
     }
     return score;

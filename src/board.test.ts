@@ -51,7 +51,8 @@ const testWordList = [
   'lion',
   'lad',
   'bone',
-  'capes'
+  'capes',
+  'valence'
 ];
 
 describe('UpwordsBoard', () => {
@@ -455,6 +456,25 @@ describe('UpwordsBoard', () => {
         // play the word 'CINDERS' from [2, 9] going vertically
         const moveResult = board.playTiles(makePlay('CINDERS', [2, 9], PlayDirection.Vertical));
         expect(moveResult.points).toBe(43);
+      });
+
+      it('should not award a 20 point bonus if used "tiles" are blanks', () => {
+        const initialUBF = [
+          ['1N', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+          ['1U', '0 ', '0 ', '1F', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+          ['1R', '0 ', '0 ', '1A', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+          ['1D', '0 ', '0 ', '1I', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+          ['1S', '1I', '1L', '1E', '1X', '0 ', '0 ', '0 ', '0 ', '0 '],
+          ['0 ', '0 ', '0 ', '1N', '1U', '1D', '1Z', '1H', '0 ', '0 '],
+          ['0 ', '0 ', '0 ', '1C', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+          ['0 ', '0 ', '0 ', '1E', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+          ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+          ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ']
+        ];
+        const board = new UpwordsBoard(testWordList, initialUBF);
+        // play the word 'CINDERS' from [2, 9] going vertically
+        const moveResult = board.playTiles(makePlay('V L    ', [1, 3], PlayDirection.Vertical));
+        expect(moveResult.points).toBe(9);
       });
     });
 
