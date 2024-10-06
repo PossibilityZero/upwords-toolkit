@@ -234,7 +234,6 @@ class IllegalPlay {
       word
         .map((cell) => cell.letter)
         .map((letter) => letter.toLowerCase())
-        .map((letter) => (letter === 'q' ? 'qu' : letter))
         .join('')
     );
     for (const word of formedWords) {

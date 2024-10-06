@@ -40,7 +40,7 @@ const testWordList = [
   'apes',
   'trip',
   'top',
-  'quick',
+  'qick',
   'test',
   'modal',
   'long',
@@ -405,13 +405,6 @@ describe('UpwordsBoard', () => {
         const moveResult = board.playTiles(makePlay('SSPACE', [4, 3], PlayDirection.Horizontal));
         expect(moveResult.isValid).toBe(false);
         expect(moveResult.error).toBe(MoveErrorCode.InvalidWord);
-      });
-
-      it('should treat "Q" as "Qu" for spelling', () => {
-        const board = new UpwordsBoard(testWordList);
-        // play the word 'QUICK' from [4, 3] going horizontally
-        const moveResult = board.playTiles(makePlay('QICK', [4, 3], PlayDirection.Horizontal));
-        expect(moveResult.isValid).toBe(true);
       });
     });
 
