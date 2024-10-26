@@ -43,7 +43,7 @@ fs.readFile('./twl06.txt', 'utf8', (err, data) => {
     let include = true;
     let reason = 0;
     // contract "qu" as one tile
-    const calculateTileLength = (w) => w.length - (w.search(/qu/) > 0 ? 1 : 0);
+    const calculateTileLength = (w) => w.length - (w.search(/qu/) >= 0 ? 1 : 0);
     const tileLength = calculateTileLength(word);
     if (tileLength > 10) {
       reason = 'Too long';
