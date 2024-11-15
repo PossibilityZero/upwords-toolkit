@@ -2,8 +2,10 @@ import { UpwordsGame } from './game.js';
 import { UpwordsBoard } from './board.js';
 import { UBFHelper } from './boardUtils.js';
 import { TileSet, TileRack, TileBag } from './tiles.js';
+import { prepareUpwordsWordList, defaultTileCounts, defaultWordFilterOptions } from './words.js';
 
 export { UpwordsGame, UpwordsBoard, UBFHelper, TileSet, TileRack, TileBag };
+export { prepareUpwordsWordList, defaultTileCounts, defaultWordFilterOptions };
 
 // types
 import {

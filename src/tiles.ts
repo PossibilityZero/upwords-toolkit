@@ -58,6 +58,35 @@ type FullTiles = {
     | 'Z']: number;
 };
 
+const defaultTileCounts = {
+  A: 7,
+  B: 3,
+  C: 4,
+  D: 5,
+  E: 8,
+  F: 3,
+  G: 3,
+  H: 3,
+  I: 7,
+  J: 1,
+  K: 2,
+  L: 5,
+  M: 5,
+  N: 5,
+  O: 7,
+  P: 3,
+  Q: 1,
+  R: 5,
+  S: 6,
+  T: 5,
+  U: 5,
+  V: 1,
+  W: 2,
+  X: 1,
+  Y: 2,
+  Z: 1
+};
+
 type Letter = keyof FullTiles;
 
 class TileSet {
@@ -261,34 +290,7 @@ class TileRack extends TileSet {
 class TileBag extends TileSet {
   constructor() {
     super();
-    this.setTiles({
-      A: 7,
-      B: 3,
-      C: 4,
-      D: 5,
-      E: 8,
-      F: 3,
-      G: 3,
-      H: 3,
-      I: 7,
-      J: 1,
-      K: 2,
-      L: 5,
-      M: 5,
-      N: 5,
-      O: 7,
-      P: 3,
-      Q: 1,
-      R: 5,
-      S: 6,
-      T: 5,
-      U: 5,
-      V: 1,
-      W: 2,
-      X: 1,
-      Y: 2,
-      Z: 1
-    });
+    this.setTiles(defaultTileCounts);
   }
 
   public drawRandomTile(): Tiles {
@@ -323,4 +325,5 @@ class TileBag extends TileSet {
 }
 
 export { TileSet, TileRack, TileBag };
+export { defaultTileCounts };
 export { Letter, Tiles, FullTiles };

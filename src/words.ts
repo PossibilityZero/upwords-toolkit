@@ -1,3 +1,4 @@
+import { defaultTileCounts } from './tiles.js';
 type Options = {
   minLength?: number;
   maxLength?: number;
@@ -8,35 +9,6 @@ type Options = {
 type RemovedWord = {
   word: string;
   reason: string;
-};
-
-const defaultTileCounts = {
-  A: 7,
-  B: 3,
-  C: 4,
-  D: 5,
-  E: 8,
-  F: 3,
-  G: 3,
-  H: 3,
-  I: 7,
-  J: 1,
-  K: 2,
-  L: 5,
-  M: 5,
-  N: 5,
-  O: 7,
-  P: 3,
-  Q: 1,
-  R: 5,
-  S: 6,
-  T: 5,
-  U: 5,
-  V: 1,
-  W: 2,
-  X: 1,
-  Y: 2,
-  Z: 1
 };
 
 const defaultWordFilterOptions: Options = {
@@ -72,7 +44,7 @@ function prepareUpwordsWordList(
       removeReason = 'too long';
     }
     if (options.tileCounts) {
-      include = compareWordTileCount(word, options.tileCounts);
+      include = include && compareWordTileCount(word, options.tileCounts);
       if (!include) {
         removeReason = 'tile count exceeded';
       }
