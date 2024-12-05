@@ -25,11 +25,15 @@ type IPlayValidationResult = {
   error: MoveErrorCode;
 };
 
+type WordLookup = {
+  has: (word: string) => boolean;
+};
+
 class IllegalPlay {
-  static validWordsTrie: Trie;
+  static validWords: WordLookup;
   static init(wordList: string[]): void {
     const validWords = wordList.filter((word) => word.length >= 2);
-    this.validWordsTrie = Trie.fromArray(validWords);
+    this.validWords = Trie.fromArray(validWords);
   }
 
   static playOutOfBounds(play: UpwordsPlay): IPlayValidationResult {
@@ -81,7 +85,6 @@ class IllegalPlay {
       // Don't check for isolation if the board is empty
       return { isIllegal: false, error: MoveErrorCode.NotConnected };
     }
-    let isIllegal = false;
     const { tiles, start, direction } = play;
     const adjacentCoords: Coord[] = [];
     // push the coordinates before and after the play
@@ -99,9 +102,8 @@ class IllegalPlay {
     const touchesExistingTile = adjacentCoords.filter(coordIsInBounds).some((coord) => {
       return UBFHelper.getHeightAt(board, coord) > 0;
     });
-    isIllegal = !touchesExistingTile;
     return {
-      isIllegal,
+      isIllegal: !touchesExistingTile,
       error: MoveErrorCode.NotConnected
     };
   }
@@ -237,7 +239,7 @@ class IllegalPlay {
         .join('')
     );
     for (const word of formedWords) {
-      if (IllegalPlay.validWordsTrie.has(word) === false) {
+      if (IllegalPlay.validWords.has(word) === false) {
         return {
           isIllegal: true,
           error: MoveErrorCode.InvalidWord

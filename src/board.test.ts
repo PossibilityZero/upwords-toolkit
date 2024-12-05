@@ -1,6 +1,13 @@
-import { UpwordsBoard } from './board';
+import { IMoveResult, UpwordsBoard } from './board';
 import { UpwordsPlay, PlayDirection, MoveErrorCode } from './board';
 
+/**
+ * Test helper:
+ * Create a play object with the given tiles, start position, and direction.
+ * @param tiles The tiles to play.
+ * @param start The starting position of the play.
+ * @param direction The direction of the play.
+ */
 function makePlay(tiles: string, start: [number, number], direction: PlayDirection): UpwordsPlay {
   return {
     tiles,
@@ -8,6 +15,38 @@ function makePlay(tiles: string, start: [number, number], direction: PlayDirecti
     direction
   };
 }
+
+/**
+ * Test helper:
+ * Assert that a move result is valid.
+ * @param moveResult The move result to check.
+ */
+function expectValidMove(moveResult: IMoveResult): void {
+  expect(moveResult.isValid).toBe(true);
+}
+
+/**
+ * Test helper:
+ * Assert that a move result is valid with a specific score.
+ * @param moveResult The move result to check.
+ * @param score The expected score.
+ */
+function expectValidMoveWithScore(moveResult: IMoveResult, score: number): void {
+  expectValidMove(moveResult);
+  expect(moveResult.points).toBe(score);
+}
+
+/**
+ * Test helper:
+ * Assert that a move result is invalid with a specific error code.
+ * @param moveResult The move result to check.
+ * @param errorCode The expected error code.
+ */
+function expectInvalidMoveWithErrorCode(moveResult: IMoveResult, errorCode: MoveErrorCode): void {
+  expect(moveResult.isValid).toBe(false);
+  expect(moveResult.error).toBe(errorCode);
+}
+
 const testWordList = [
   'hello',
   'world',
@@ -132,14 +171,6 @@ describe('UpwordsBoard', () => {
       expect(board.getUBF()).toEqual(outputUBF);
     });
 
-    test('response should contain points scored and validity of the move', () => {
-      const board = new UpwordsBoard(testWordList);
-      // play the five tiles 'HELLO' from [4, 3] going horizontally
-      const moveResult = board.playTiles(makePlay('HELLO', [4, 3], PlayDirection.Horizontal));
-      expect(moveResult.points).toBeGreaterThan(0);
-      expect(moveResult.isValid).toBe(true);
-    });
-
     it('should stack tiles on top of existing tiles', () => {
       const board = new UpwordsBoard(testWordList);
       // play the five tiles 'HELLO' from [4, 3] going horizontally
@@ -191,17 +222,20 @@ describe('UpwordsBoard', () => {
         // attempt to play the word 'LONGEST' from [5, 5] going vertically
         // actual coordidinate will be [6, 5] to use the first 'L' in 'HELLO'
         // this should be rejected because it would go out of bounds
-        const moveResult1 = board.playTiles(makePlay('LONGEST', [6, 5], PlayDirection.Vertical));
-        expect(moveResult1.isValid).toBe(false);
-        expect(moveResult1.error).toBe(MoveErrorCode.OutOfBounds);
+        expectInvalidMoveWithErrorCode(
+          board.playTiles(makePlay('LONGEST', [6, 5], PlayDirection.Vertical)),
+          MoveErrorCode.OutOfBounds
+        );
         // same as above, but with the word 'GREAT' from [4, 7] going horizontally
-        const moveResult2 = board.playTiles(makePlay('GREAT', [4, 7], PlayDirection.Horizontal));
-        expect(moveResult2.isValid).toBe(false);
-        expect(moveResult2.error).toBe(MoveErrorCode.OutOfBounds);
+        expectInvalidMoveWithErrorCode(
+          board.playTiles(makePlay('GREAT', [4, 7], PlayDirection.Horizontal)),
+          MoveErrorCode.OutOfBounds
+        );
         // play a word starting from out of bounds
-        const moveResult3 = board.playTiles(makePlay('STRETC', [-1, 3], PlayDirection.Vertical));
-        expect(moveResult3.isValid).toBe(false);
-        expect(moveResult3.error).toBe(MoveErrorCode.OutOfBounds);
+        expectInvalidMoveWithErrorCode(
+          board.playTiles(makePlay('STRETC', [-1, 3], PlayDirection.Vertical)),
+          MoveErrorCode.OutOfBounds
+        );
       });
 
       it('should reject plays that stack tiles over height 5', () => {
@@ -220,9 +254,10 @@ describe('UpwordsBoard', () => {
         const board = new UpwordsBoard(testWordList, initialUBF);
         // try to make the word 'TEAM' from [4, 3] going horizontally
         // should fail because the 'A' would be stacked on an 'S' of height 5
-        const moveResult = board.playTiles(makePlay('AM', [4, 5], PlayDirection.Horizontal));
-        expect(moveResult.isValid).toBe(false);
-        expect(moveResult.error).toBe(MoveErrorCode.HeightLimitExceeded);
+        expectInvalidMoveWithErrorCode(
+          board.playTiles(makePlay('AM', [4, 5], PlayDirection.Horizontal)),
+          MoveErrorCode.HeightLimitExceeded
+        );
       });
 
       it("should reject plays that don't connect to any existing tiles", () => {
@@ -230,9 +265,10 @@ describe('UpwordsBoard', () => {
         board.playTiles(makePlay('HELLO', [4, 3], PlayDirection.Horizontal));
         // try to make the word 'WORLD' from [5, 2] going vertically,
         // so that the 'W' is diagonal from the 'H' in 'HELLO'
-        const moveResult = board.playTiles(makePlay('WORLD', [5, 2], PlayDirection.Vertical));
-        expect(moveResult.isValid).toBe(false);
-        expect(moveResult.error).toBe(MoveErrorCode.NotConnected);
+        expectInvalidMoveWithErrorCode(
+          board.playTiles(makePlay('WORLD', [5, 2], PlayDirection.Vertical)),
+          MoveErrorCode.NotConnected
+        );
       });
 
       it('should reject plays that have gaps', () => {
@@ -252,14 +288,16 @@ describe('UpwordsBoard', () => {
         // Try to play 'HEN' and 'UP' from [3, 4] going vertically
         // This uses the 'E' in 'HELLO' and the 'P' in 'PRAWN',
         // but there is a gap between the two words.
-        const moveResult1 = board.playTiles(makePlay('H N U', [3, 4], PlayDirection.Vertical));
-        expect(moveResult1.isValid).toBe(false);
-        expect(moveResult1.error).toBe(MoveErrorCode.HasGap);
+        expectInvalidMoveWithErrorCode(
+          board.playTiles(makePlay('H N U', [3, 4], PlayDirection.Vertical)),
+          MoveErrorCode.HasGap
+        );
         // Similar test in the horizontal direction
         // Try to play 'BE' and 'OLD' in row X = 5
-        const moveResult2 = board.playTiles(makePlay('BE  O D', [5, 2], PlayDirection.Horizontal));
-        expect(moveResult2.isValid).toBe(false);
-        expect(moveResult2.error).toBe(MoveErrorCode.HasGap);
+        expectInvalidMoveWithErrorCode(
+          board.playTiles(makePlay('BE  O D', [5, 2], PlayDirection.Horizontal)),
+          MoveErrorCode.HasGap
+        );
       });
 
       it('should reject plays that stack the same tile on top of itself', () => {
@@ -268,9 +306,10 @@ describe('UpwordsBoard', () => {
         board.playTiles(makePlay('HELLO', [4, 3], PlayDirection.Horizontal));
         // try to play the word 'WORLD' from [1, 5] going vertically
         // this should fail because the 'L' would be stacked on top of itself
-        const moveResult = board.playTiles(makePlay('WORLD', [1, 5], PlayDirection.Vertical));
-        expect(moveResult.isValid).toBe(false);
-        expect(moveResult.error).toBe(MoveErrorCode.SameTileStacked);
+        expectInvalidMoveWithErrorCode(
+          board.playTiles(makePlay('WORLD', [1, 5], PlayDirection.Vertical)),
+          MoveErrorCode.SameTileStacked
+        );
       });
 
       it('should reject plays that completely cover existing words', () => {
@@ -279,25 +318,28 @@ describe('UpwordsBoard', () => {
         board.playTiles(makePlay('HELLO', [4, 3], PlayDirection.Horizontal));
         // try to play the word 'WORLD' from [4, 3] going horizontally
         // this should fail because it completely covers the existing word 'HELLO'
-        const moveResult = board.playTiles(makePlay('BOARD', [4, 3], PlayDirection.Horizontal));
-        expect(moveResult.isValid).toBe(false);
-        expect(moveResult.error).toBe(MoveErrorCode.CoversExistingWord);
+        expectInvalidMoveWithErrorCode(
+          board.playTiles(makePlay('BOARD', [4, 3], PlayDirection.Horizontal)),
+          MoveErrorCode.CoversExistingWord
+        );
       });
 
       it('should reject first play that does not cover the four center squares', () => {
         const board = new UpwordsBoard(testWordList);
         // try to play the word 'HELLO' from [3, 3] going horizontally
         // this should fail because it does not cover the four center squares
-        const moveResult1 = board.playTiles(makePlay('HELLO', [3, 3], PlayDirection.Horizontal));
-        expect(moveResult1.isValid).toBe(false);
-        expect(moveResult1.error).toBe(MoveErrorCode.FirstPlayDoesNotCoverCenter);
+        expectInvalidMoveWithErrorCode(
+          board.playTiles(makePlay('HELLO', [3, 3], PlayDirection.Horizontal)),
+          MoveErrorCode.FirstPlayDoesNotCoverCenter
+        );
 
         // test with a vertical play
         // try to play the word 'WORD' from [0, 4] going vertically
         // this doesn't reach the center tiles by one square
-        const moveResult2 = board.playTiles(makePlay('WORD', [0, 4], PlayDirection.Vertical));
-        expect(moveResult2.isValid).toBe(false);
-        expect(moveResult2.error).toBe(MoveErrorCode.FirstPlayDoesNotCoverCenter);
+        expectInvalidMoveWithErrorCode(
+          board.playTiles(makePlay('WORD', [0, 4], PlayDirection.Vertical)),
+          MoveErrorCode.FirstPlayDoesNotCoverCenter
+        );
       });
 
       // Tests:
@@ -326,17 +368,20 @@ describe('UpwordsBoard', () => {
           ];
           const board = new UpwordsBoard(testWordList, initialUBF);
           // vertical: CARE -> CARES
-          const moveResult1 = board.playTiles(makePlay('S', [6, 5], PlayDirection.Vertical));
-          expect(moveResult1.isValid).toBe(false);
-          expect(moveResult1.error).toBe(MoveErrorCode.OnlyPluralizesWord);
+          expectInvalidMoveWithErrorCode(
+            board.playTiles(makePlay('S', [6, 5], PlayDirection.Vertical)),
+            MoveErrorCode.OnlyPluralizesWord
+          );
           // horizontal: CART -> CARTS
-          const moveResult2 = board.playTiles(makePlay('S', [2, 9], PlayDirection.Horizontal));
-          expect(moveResult2.isValid).toBe(false);
-          expect(moveResult2.error).toBe(MoveErrorCode.OnlyPluralizesWord);
+          expectInvalidMoveWithErrorCode(
+            board.playTiles(makePlay('S', [2, 9], PlayDirection.Horizontal)),
+            MoveErrorCode.OnlyPluralizesWord
+          );
           // 2 words: WORDs and ARTs
-          const moveResult3 = board.playTiles(makePlay('S', [4, 7], PlayDirection.Horizontal));
-          expect(moveResult3.isValid).toBe(false);
-          expect(moveResult3.error).toBe(MoveErrorCode.OnlyPluralizesWord);
+          expectInvalidMoveWithErrorCode(
+            board.playTiles(makePlay('S', [4, 7], PlayDirection.Horizontal)),
+            MoveErrorCode.OnlyPluralizesWord
+          );
         });
 
         // Allow various other cases of adding S to words
@@ -355,8 +400,7 @@ describe('UpwordsBoard', () => {
           ];
           const board = new UpwordsBoard(testWordList, initialUBF);
           // HIS -> HISS
-          const moveResult = board.playTiles(makePlay('S', [4, 6], PlayDirection.Horizontal));
-          expect(moveResult.isValid).toBe(true);
+          expectValidMove(board.playTiles(makePlay('S', [4, 6], PlayDirection.Horizontal)));
         });
 
         it('should allow single S plays that are not pluralizations', () => {
@@ -374,11 +418,9 @@ describe('UpwordsBoard', () => {
           ];
           const board = new UpwordsBoard(testWordList, initialUBF);
           // Adding single S to the start of a word
-          const moveResult1 = board.playTiles(makePlay('S', [4, 2], PlayDirection.Vertical));
-          expect(moveResult1.isValid).toBe(true);
+          expectValidMove(board.playTiles(makePlay('S', [4, 2], PlayDirection.Vertical)));
           // Adding single S to form a 2-letter word
-          const moveResult2 = board.playTiles(makePlay('S', [5, 4], PlayDirection.Vertical));
-          expect(moveResult2.isValid).toBe(true);
+          expectValidMove(board.playTiles(makePlay('S', [5, 4], PlayDirection.Vertical)));
         });
 
         it('should allow adding an S to a word if it is a pluralization but also forms a new word', () => {
@@ -396,8 +438,7 @@ describe('UpwordsBoard', () => {
           ];
           const board = new UpwordsBoard(testWordList, initialUBF);
           // Horizontally, "HISS" makes this safe
-          const moveResult = board.playTiles(makePlay('S', [4, 6], PlayDirection.Horizontal));
-          expect(moveResult.isValid).toBe(true);
+          expectValidMove(board.playTiles(makePlay('S', [4, 6], PlayDirection.Horizontal)));
         });
       });
     });
@@ -405,9 +446,10 @@ describe('UpwordsBoard', () => {
     describe('word checking', () => {
       it('should reject words that are not in the dictionary', () => {
         const board = new UpwordsBoard(testWordList);
-        const moveResult = board.playTiles(makePlay('SSPACE', [4, 3], PlayDirection.Horizontal));
-        expect(moveResult.isValid).toBe(false);
-        expect(moveResult.error).toBe(MoveErrorCode.InvalidWord);
+        expectInvalidMoveWithErrorCode(
+          board.playTiles(makePlay('SSPACE', [4, 3], PlayDirection.Horizontal)),
+          MoveErrorCode.InvalidWord
+        );
       });
     });
 
@@ -416,8 +458,10 @@ describe('UpwordsBoard', () => {
       it('should score double for words of all 1 height', () => {
         const board = new UpwordsBoard(testWordList);
         // play the word 'TESTING' from [4, 1] going horizontally
-        const moveResult = board.playTiles(makePlay('TEST', [4, 1], PlayDirection.Horizontal));
-        expect(moveResult.points).toBe(8);
+        expectValidMoveWithScore(
+          board.playTiles(makePlay('TEST', [4, 1], PlayDirection.Horizontal)),
+          8
+        );
       });
 
       test('score equals the sum of the height of tiles for all words created', () => {
@@ -436,9 +480,10 @@ describe('UpwordsBoard', () => {
         const board = new UpwordsBoard(testWordList, initialUBF);
         // play the word 'MODAL' from [7, 4] going horizontally
         // First letter is omitted because it is already on the board
-        const moveResult = board.playTiles(makePlay('OD L', [7, 5], PlayDirection.Horizontal));
-        // MODAL: 16, LONG: 10, LOX: 4, ED: 4
-        expect(moveResult.points).toBe(34);
+        expectValidMoveWithScore(
+          board.playTiles(makePlay('OD L', [7, 5], PlayDirection.Horizontal)),
+          34 // MODAL: 16, LONG: 10, LOX: 4, ED: 4
+        );
       });
 
       it('should award a 20 point bonus for using all 7 tiles', () => {
@@ -456,8 +501,10 @@ describe('UpwordsBoard', () => {
         ];
         const board = new UpwordsBoard(testWordList, initialUBF);
         // play the word 'CINDERS' from [2, 9] going vertically
-        const moveResult = board.playTiles(makePlay('CINDERS', [2, 9], PlayDirection.Vertical));
-        expect(moveResult.points).toBe(43);
+        expectValidMoveWithScore(
+          board.playTiles(makePlay('CINDERS', [2, 9], PlayDirection.Vertical)),
+          43
+        );
       });
 
       it('should not award a 20 point bonus if used "tiles" are blanks', () => {
@@ -475,8 +522,10 @@ describe('UpwordsBoard', () => {
         ];
         const board = new UpwordsBoard(testWordList, initialUBF);
         // play the word 'CINDERS' from [2, 9] going vertically
-        const moveResult = board.playTiles(makePlay('V L    ', [1, 3], PlayDirection.Vertical));
-        expect(moveResult.points).toBe(9);
+        expectValidMoveWithScore(
+          board.playTiles(makePlay('V L    ', [1, 3], PlayDirection.Vertical)),
+          9
+        );
       });
     });
 
@@ -500,9 +549,8 @@ describe('UpwordsBoard', () => {
         ];
         const board = new UpwordsBoard(testWordList, initialUBF);
         // Place the letters "LIO" to form the word "LION" from [4, 2] going horizontally
-        const moveResult = board.playTiles(makePlay('LIO', [4, 2], PlayDirection.Horizontal));
         // This move should be valid, because no whole word is covered
-        expect(moveResult.isValid).toBe(true);
+        expectValidMove(board.playTiles(makePlay('LIO', [4, 2], PlayDirection.Horizontal)));
       });
 
       it('should handle words at the edge of the board', () => {
@@ -519,9 +567,7 @@ describe('UpwordsBoard', () => {
           ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ']
         ];
         const board = new UpwordsBoard(testWordList, initialUBF);
-        // Horizontally, "HISS" makes this safe
-        const moveResult = board.playTiles(makePlay('S', [4, 6], PlayDirection.Horizontal));
-        expect(moveResult.isValid).toBe(true);
+        expectValidMove(board.playTiles(makePlay('S', [4, 6], PlayDirection.Horizontal)));
       });
 
       it('should give 2 bonus points for "Qu" tiles if they are played in a 1-height word', () => {
@@ -538,13 +584,14 @@ describe('UpwordsBoard', () => {
           ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ']
         ];
         const board = new UpwordsBoard(testWordList, initialUBF);
-        // Horizontally, "HISS" makes this safe
-        const moveResult1 = board.playTiles(makePlay('QIT', [4, 4], PlayDirection.Horizontal));
-        expect(moveResult1.isValid).toBe(true);
-        expect(moveResult1.points).toBe(8);
-        const moveResult2 = board.playTiles(makePlay('Z', [4, 6], PlayDirection.Horizontal));
-        expect(moveResult2.isValid).toBe(true);
-        expect(moveResult2.points).toBe(4);
+        expectValidMoveWithScore(
+          board.playTiles(makePlay('QIT', [4, 4], PlayDirection.Horizontal)),
+          8
+        );
+        expectValidMoveWithScore(
+          board.playTiles(makePlay('Z', [4, 6], PlayDirection.Horizontal)),
+          4
+        );
       });
     });
   });
@@ -576,9 +623,7 @@ describe('UpwordsBoard', () => {
         const board = new UpwordsBoard(testWordList);
         // play the five tiles 'HELLO' from [4, 3] going horizontally
         board.playTiles(makePlay('HELLO', [4, 3], PlayDirection.Horizontal));
-        const moveResult = board.getPreviousMove();
-        expect(moveResult.points).toBe(10);
-        expect(moveResult.isValid).toBe(true);
+        expectValidMoveWithScore(board.getPreviousMove(), 10);
       });
     });
 
