@@ -99,11 +99,23 @@ class TileSet {
     ) as FullTiles;
   }
 
+  static tilesFromString(tiles: string): Tiles {
+    const tileCounts: Tiles = {};
+    for (const tile of tiles.toUpperCase()) {
+      if (tile !== ' ') tileCounts[tile as Letter] = (tileCounts[tile as Letter] || 0) + 1;
+    }
+    return tileCounts;
+  }
+
   /**
    * Get the total count of tiles in the set
    */
   public get tileCount(): number {
     return Object.values(this.tiles).reduce((a, b) => a + b, 0);
+  }
+
+  public getTiles(): Tiles {
+    return TileSet.tilesFromString(this.listTiles());
   }
 
   /**
@@ -243,6 +255,15 @@ class TileSet {
     Object.keys(this.tiles).forEach((letter) => {
       this.tiles[letter as Letter] = 0;
     });
+  }
+
+  public hasTiles(tiles: Tiles): boolean {
+    for (const [letter, count] of Object.entries(tiles)) {
+      if (this.getLetter(letter as Letter) < count) {
+        return false;
+      }
+    }
+    return this.tileCount > 0;
   }
 }
 

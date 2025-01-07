@@ -8,6 +8,14 @@ describe('TileSet', () => {
     });
   });
 
+  describe('getTiles', () => {
+    it('should return a set of tiles', () => {
+      const newTileSet = new TileSet();
+      newTileSet.addTiles({ A: 1, B: 2, C: 3 });
+      expect(newTileSet.getTiles()).toEqual({ A: 1, B: 2, C: 3 });
+    });
+  });
+
   describe('getLetter', () => {
     it('should return the count of the given letter', () => {
       const newTileSet = new TileSet();
@@ -91,6 +99,25 @@ describe('TileSet', () => {
       newTileSet.setTiles({ A: 3, C: 2 });
       newTileSet.deleteAllTiles();
       expect(newTileSet.tileCount).toBe(0);
+    });
+  });
+
+  describe('hasTiles', () => {
+    it('should return true if the set has the given tiles', () => {
+      const newTileSet = new TileSet();
+      newTileSet.addTiles({ A: 1, B: 2, C: 3 });
+      expect(newTileSet.hasTiles({ A: 1, B: 2 })).toBe(true);
+      expect(newTileSet.hasTiles({ A: 1, B: 2, C: 4 })).toBe(false);
+    });
+  });
+
+  describe('tilesFromString', () => {
+    it('should return a set of tiles from a string', () => {
+      expect(TileSet.tilesFromString('HELLO')).toEqual({ H: 1, E: 1, L: 2, O: 1 });
+    });
+
+    it('should not count spaces', () => {
+      expect(TileSet.tilesFromString('W RLD')).toEqual({ W: 1, R: 1, L: 1, D: 1 });
     });
   });
 });
