@@ -1,5 +1,6 @@
 import { UpwordsGame } from './game';
 import { UpwordsPlay, PlayDirection, UBFHelper } from './boardUtils';
+import { MoveErrorCode } from './board';
 
 describe('UpwordsGame', () => {
   const defaultStarterMove: UpwordsPlay = {
@@ -112,6 +113,44 @@ describe('UpwordsGame', () => {
       game.playMove(badMove);
       expect(game.currentPlayer).toBe(0);
       expect(game.getScore(0)).toBe(0);
+    });
+  });
+
+  describe('checkMove', () => {
+    it('should return the play result if the play is valid', () => {
+      const game = new UpwordsGame(1, true);
+      game.getTileBag().removeTiles({ H: 1, E: 3, L: 2, O: 1 });
+      game.getTiles(0).addTiles({ H: 1, E: 3, L: 2, O: 1 });
+      const result = game.checkMove(defaultStarterMove);
+      expect(result.isValid).toBe(true);
+      expect(result.points).toBe(10);
+    });
+
+    it('should return the correct error code if the play is invalid', () => {
+      const game = new UpwordsGame(1, true);
+      game.getTileBag().removeTiles({ H: 1, E: 3, L: 2, O: 1 });
+      game.getTiles(0).addTiles({ H: 1, E: 3, L: 2, O: 1 });
+      const badMove: UpwordsPlay = {
+        tiles: 'LLHEO',
+        start: [4, 3],
+        direction: PlayDirection.Horizontal
+      };
+      const result = game.checkMove(badMove);
+      expect(result.isValid).toBe(false);
+      expect(result.error).toBe(MoveErrorCode.InvalidWord);
+    });
+
+    it('should return an error if the player does not have the correct tiles', () => {
+      const game = new UpwordsGame(1, true);
+      game.getTileBag().removeTiles({ A: 1, B: 1, C: 1, D: 1, E: 1, F: 1, G: 1 });
+      game.getTiles(0).addTiles({ A: 1, B: 1, C: 1, D: 1, E: 1, F: 1, G: 1 });
+      const badMove: UpwordsPlay = {
+        tiles: 'HELLO',
+        start: [4, 3],
+        direction: PlayDirection.Horizontal
+      };
+      const result = game.checkMove(badMove);
+      expect(result.isValid).toBe(false);
     });
   });
 

@@ -1,4 +1,4 @@
-import { UpwordsBoard, UpwordsPlay, IUpwordsBoardFormat } from './board.js';
+import { UpwordsBoard, UpwordsPlay, IUpwordsBoardFormat, IMoveResult } from './board.js';
 import { TileSet, TileRack, TileBag } from './tiles.js';
 import { TWL06 } from '../data/wordList.js';
 import { prepareUpwordsWordList, defaultWordFilterOptions } from './words.js';
@@ -50,6 +50,18 @@ class UpwordsGame {
       // Cycle to the next player
       this.currentPlayer = (this.currentPlayer + 1) % this.playerCount;
     }
+  }
+
+  checkMove(play: UpwordsPlay): IMoveResult {
+    const player = this.players[this.currentPlayer];
+    if (!player) {
+      throw new Error('Player does not exist');
+    }
+    const tiles = TileSet.tilesFromString(play.tiles);
+    if (!player.tiles.hasTiles(tiles)) {
+      return { isValid: false, points: 0 };
+    }
+    return this.board.checkPlay(play);
   }
 
   #drawIntoRack(player: Player, firstDraw = false): void {
