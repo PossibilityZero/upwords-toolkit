@@ -1,6 +1,12 @@
 import { UpwordsBoard, UpwordsPlay, IUpwordsBoardFormat } from './board.js';
 import { TileSet, TileRack, TileBag } from './tiles.js';
 import { TWL06 } from '../data/wordList.js';
+import { prepareUpwordsWordList, defaultWordFilterOptions } from './words.js';
+
+type Player = {
+  tiles: TileRack;
+  score: number;
+};
 
 class UpwordsGame {
   playerCount: number;
@@ -8,7 +14,7 @@ class UpwordsGame {
   private board: UpwordsBoard;
   private manualTiles: boolean;
   tileBag: TileBag;
-  private players: { tiles: TileRack; score: number }[] = [];
+  private players: Player[] = [];
 
   constructor(playerCount = 1, manualTiles = false) {
     this.manualTiles = manualTiles;
@@ -16,41 +22,43 @@ class UpwordsGame {
     this.currentPlayer = 0;
     this.tileBag = new TileBag();
     for (let i = 0; i < playerCount; i++) {
-      const tileRack = new TileRack();
+      const newPlayer = { tiles: new TileRack(), score: 0 };
       if (!this.manualTiles) {
-        tileRack.addTiles(this.tileBag.drawRandomConsonant());
-        tileRack.addTiles(this.tileBag.drawRandomVowel());
-        while (tileRack.getMissingTiles() > 0 && this.tileBag.tileCount > 0) {
-          tileRack.addTiles(this.tileBag.drawRandomTile());
-        }
+        this.#drawIntoRack(newPlayer, true);
       }
-      // Create a new tile rack for each player
-      this.players.push({ tiles: tileRack, score: 0 });
+      this.players.push(newPlayer);
     }
-    this.board = new UpwordsBoard(TWL06);
+    const filteredTWL06 = prepareUpwordsWordList(TWL06, defaultWordFilterOptions);
+    this.board = new UpwordsBoard(filteredTWL06.keptWords);
   }
 
   playMove(play: UpwordsPlay): void {
-    const currentPlayer = this.players[this.currentPlayer];
-    if (!currentPlayer) {
+    const player = this.players[this.currentPlayer];
+    if (!player) {
       throw new Error('Player does not exist');
     }
     const tiles = TileSet.tilesFromString(play.tiles);
-    if (!currentPlayer.tiles.hasTiles(tiles)) {
+    if (!player.tiles.hasTiles(tiles)) {
       return;
     }
 
     const playResult = this.board.playTiles(play);
     if (playResult.isValid) {
-      currentPlayer.tiles.removeTiles(tiles);
-      if (!this.manualTiles) {
-        while (currentPlayer.tiles.getMissingTiles() > 0 && this.tileBag.tileCount > 0) {
-          currentPlayer.tiles.addTiles(this.tileBag.drawRandomTile());
-        }
-      }
-      this.players[this.currentPlayer]!.score += playResult.points!;
+      player.tiles.removeTiles(tiles);
+      this.#drawIntoRack(player);
+      player.score += playResult.points!;
       // Cycle to the next player
       this.currentPlayer = (this.currentPlayer + 1) % this.playerCount;
+    }
+  }
+
+  #drawIntoRack(player: Player, firstDraw = false): void {
+    if (firstDraw) {
+      player.tiles.addTiles(this.tileBag.drawRandomConsonant());
+      player.tiles.addTiles(this.tileBag.drawRandomVowel());
+    }
+    while (player.tiles.getMissingTiles() > 0 && this.tileBag.tileCount > 0) {
+      player.tiles.addTiles(this.tileBag.drawRandomTile());
     }
   }
 
