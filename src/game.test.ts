@@ -116,6 +116,23 @@ describe('UpwordsGame', () => {
     });
   });
 
+  describe('Manual Tile Drawing', () => {
+    describe('drawSpecificTiles', () => {
+      it('should draw the specified tiles for the specified player', () => {
+        const game = new UpwordsGame(2, true);
+        const result = game.drawSpecificTiles(1, 'H LLO');
+        expect(game.getTiles(1).getTiles()).toEqual({ H: 1, L: 2, O: 1 });
+        expect(result).toBeTruthy();
+      });
+
+      it('should return false if the tile bag does not have the specified tiles', () => {
+        const game = new UpwordsGame(1, true);
+        const result = game.drawSpecificTiles(0, 'XXXQQQQ');
+        expect(result).toBeFalsy();
+      });
+    });
+  });
+
   describe('checkMove', () => {
     it('should return the play result if the play is valid', () => {
       const game = new UpwordsGame(1, true);

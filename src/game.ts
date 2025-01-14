@@ -64,6 +64,21 @@ class UpwordsGame {
     return this.board.checkPlay(play);
   }
 
+  drawSpecificTiles(playerId: number, tiles: string): boolean {
+    const player = this.players[playerId];
+    if (!player) {
+      return false;
+    }
+    const playerTiles = player.tiles;
+    const tileSet = TileSet.tilesFromString(tiles);
+    if (this.tileBag.hasTiles(tileSet) === false) {
+      return false;
+    }
+    this.tileBag.removeTiles(tileSet);
+    playerTiles.addTiles(tileSet);
+    return true;
+  }
+
   #drawIntoRack(player: Player, firstDraw = false): void {
     if (firstDraw) {
       player.tiles.addTiles(this.tileBag.drawRandomConsonant());
