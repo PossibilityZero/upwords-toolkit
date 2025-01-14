@@ -117,6 +117,14 @@ describe('UpwordsGame', () => {
   });
 
   describe('Manual Tile Drawing', () => {
+    it('should not automatically draw tiles after a turn if manualTiles is set to true', () => {
+      const game = new UpwordsGame(1, true);
+      game.drawSpecificTiles(0, 'HELLO');
+      expect(game.getTiles(0).tileCount).toBe(5);
+      game.playMove(defaultStarterMove);
+      expect(game.getTiles(0).tileCount).toBe(0);
+      expect(game.getTileBag().tileCount).toBe(95);
+    });
     describe('drawSpecificTiles', () => {
       it('should draw the specified tiles for the specified player', () => {
         const game = new UpwordsGame(2, true);

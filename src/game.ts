@@ -45,8 +45,10 @@ class UpwordsGame {
     const playResult = this.board.playTiles(play);
     if (playResult.isValid) {
       player.tiles.removeTiles(tiles);
-      this.#drawIntoRack(player);
       player.score += playResult.points!;
+      if (!this.manualTiles) {
+        this.#drawIntoRack(player);
+      }
       // Cycle to the next player
       this.currentPlayer = (this.currentPlayer + 1) % this.playerCount;
     }
