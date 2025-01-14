@@ -125,6 +125,7 @@ describe('UpwordsGame', () => {
       expect(game.getTiles(0).tileCount).toBe(0);
       expect(game.getTileBag().tileCount).toBe(95);
     });
+
     describe('drawSpecificTiles', () => {
       it('should draw the specified tiles for the specified player', () => {
         const game = new UpwordsGame(2, true);
@@ -137,6 +138,26 @@ describe('UpwordsGame', () => {
         const game = new UpwordsGame(1, true);
         const result = game.drawSpecificTiles(0, 'XXXQQQQ');
         expect(result).toBeFalsy();
+      });
+    });
+
+    describe('returnSpecificTiles', () => {
+      it('should return the specified tiles to the tile bag', () => {
+        const game = new UpwordsGame(1, true);
+        game.drawSpecificTiles(0, 'HELLO');
+        const result = game.returnSpecificTiles(0, 'LLO');
+        expect(result).toBeTruthy();
+        expect(game.getTiles(0).tileCount).toBe(2);
+        expect(game.getTileBag().tileCount).toBe(98);
+        expect(game.getTiles(0).getTiles()).toEqual({ H: 1, E: 1 });
+      });
+
+      it('should return false if the player does not have the specified tiles', () => {
+        const game = new UpwordsGame(1, true);
+        game.drawSpecificTiles(0, 'HELL');
+        const result = game.returnSpecificTiles(0, 'HELLO');
+        expect(result).toBeFalsy();
+        expect(game.getTiles(0).tileCount).toBe(4);
       });
     });
   });

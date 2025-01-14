@@ -73,12 +73,29 @@ class UpwordsGame {
     }
     const playerTiles = player.tiles;
     const tileSet = TileSet.tilesFromString(tiles);
-    if (this.tileBag.hasTiles(tileSet) === false) {
+    if (this.tileBag.hasTiles(tileSet)) {
+      this.tileBag.removeTiles(tileSet);
+      playerTiles.addTiles(tileSet);
+      return true;
+    } else {
       return false;
     }
-    this.tileBag.removeTiles(tileSet);
-    playerTiles.addTiles(tileSet);
-    return true;
+  }
+
+  returnSpecificTiles(playerId: number, tiles: string): boolean {
+    const player = this.players[playerId];
+    if (!player) {
+      return false;
+    }
+    const playerTiles = player.tiles;
+    const tileSet = TileSet.tilesFromString(tiles);
+    if (playerTiles.hasTiles(tileSet)) {
+      playerTiles.removeTiles(tileSet);
+      this.tileBag.addTiles(tileSet);
+      return true;
+    } else {
+      return false;
+    }
   }
 
   #drawIntoRack(player: Player, firstDraw = false): void {
