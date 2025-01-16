@@ -451,6 +451,14 @@ describe('UpwordsBoard', () => {
           MoveErrorCode.InvalidWord
         );
       });
+
+      it('should reject single-letter words on the first play', () => {
+        const board = new UpwordsBoard(testWordList);
+        expectInvalidMoveWithErrorCode(
+          board.playTiles(makePlay('A', [4, 4], PlayDirection.Horizontal)),
+          MoveErrorCode.InvalidWord
+        );
+      });
     });
 
     describe('scoring', () => {

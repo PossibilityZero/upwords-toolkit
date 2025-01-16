@@ -23,6 +23,7 @@ enum MoveErrorCode {
 type IPlayValidationResult = {
   isIllegal: boolean;
   error: MoveErrorCode;
+  message?: string;
 };
 
 type WordLookup = {
@@ -232,6 +233,12 @@ class IllegalPlay {
 
   static wordIsInvalid(board: IUpwordsBoardFormat, play: UpwordsPlay): IPlayValidationResult {
     const words = UBFHelper.getWordsFromPlay(board, play);
+    if (words.length === 0) {
+      return {
+        isIllegal: true,
+        error: MoveErrorCode.InvalidWord
+      };
+    }
     const formedWords = words.map((word) =>
       word
         .map((cell) => cell.letter)
@@ -242,7 +249,8 @@ class IllegalPlay {
       if (IllegalPlay.validWords.has(word) === false) {
         return {
           isIllegal: true,
-          error: MoveErrorCode.InvalidWord
+          error: MoveErrorCode.InvalidWord,
+          message: `${word} is not a valid word`
         };
       }
     }
