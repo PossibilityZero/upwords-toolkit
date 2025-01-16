@@ -198,6 +198,19 @@ describe('UpwordsGame', () => {
       const result = game.checkMove(badMove);
       expect(result.isValid).toBe(false);
     });
+
+    it('should have an option to ignore the player rack when checking a move', () => {
+      const game = new UpwordsGame(1, true);
+      game.getTileBag().removeTiles({ A: 1, B: 1, C: 1, D: 1, E: 1, F: 1, G: 1 });
+      game.getTiles(0).addTiles({ A: 1, B: 1, C: 1, D: 1, E: 1, F: 1, G: 1 });
+      const badMove: UpwordsPlay = {
+        tiles: 'HELLO',
+        start: [4, 3],
+        direction: PlayDirection.Horizontal
+      };
+      const result = game.checkMove(badMove, true);
+      expect(result.isValid).toBe(true);
+    });
   });
 
   describe('gameState', () => {

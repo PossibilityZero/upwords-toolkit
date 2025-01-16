@@ -54,13 +54,13 @@ class UpwordsGame {
     }
   }
 
-  checkMove(play: UpwordsPlay): IMoveResult {
+  checkMove(play: UpwordsPlay, boardStateOnly = false): IMoveResult {
     const player = this.players[this.currentPlayer];
     if (!player) {
       throw new Error('Player does not exist');
     }
     const tiles = TileSet.tilesFromString(play.tiles);
-    if (!player.tiles.hasTiles(tiles)) {
+    if (!player.tiles.hasTiles(tiles) && !boardStateOnly) {
       return { isValid: false, points: 0 };
     }
     return this.board.checkPlay(play);
@@ -114,6 +114,7 @@ class UpwordsGame {
   }
 
   getBoard(): UpwordsBoard {
+    // TODO: Fix this method, side effect of messing up UpwordsBoard trie
     // Return a copy of the game board
     return new UpwordsBoard(TWL06, this.board.getUBF());
   }
