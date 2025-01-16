@@ -1,4 +1,3 @@
-import { Trie } from '@kamilmielnik/trie';
 import { UBFHelper } from './boardUtils.js';
 import { UpwordsPlay, IUpwordsBoardFormat, Coord, PlayDirection } from './boardUtils.js';
 
@@ -31,12 +30,6 @@ type WordLookup = {
 };
 
 class IllegalPlay {
-  static validWords: WordLookup;
-  static init(wordList: string[]): void {
-    const validWords = wordList.filter((word) => word.length >= 2);
-    this.validWords = Trie.fromArray(validWords);
-  }
-
   static playOutOfBounds(play: UpwordsPlay): IPlayValidationResult {
     let isIllegal = false;
     const { tiles, start, direction } = play;
@@ -231,7 +224,11 @@ class IllegalPlay {
     };
   }
 
-  static wordIsInvalid(board: IUpwordsBoardFormat, play: UpwordsPlay): IPlayValidationResult {
+  static wordIsInvalid(
+    board: IUpwordsBoardFormat,
+    play: UpwordsPlay,
+    validWords: WordLookup
+  ): IPlayValidationResult {
     const words = UBFHelper.getWordsFromPlay(board, play);
     if (words.length === 0) {
       return {
@@ -242,11 +239,11 @@ class IllegalPlay {
     const formedWords = words.map((word) =>
       word
         .map((cell) => cell.letter)
-        .map((letter) => letter.toLowerCase())
+        .map((letter) => letter.toUpperCase())
         .join('')
     );
     for (const word of formedWords) {
-      if (IllegalPlay.validWords.has(word) === false) {
+      if (validWords.has(word) === false) {
         return {
           isIllegal: true,
           error: MoveErrorCode.InvalidWord,
@@ -302,6 +299,7 @@ class IllegalPlay {
 class UpwordsBoard {
   private ubfBoard: IUpwordsBoardFormat;
   private moveHistory: IMoveResult[];
+  private wordLookup: WordLookup;
   private static playValidations = [IllegalPlay.playOutOfBounds];
   private static boardValidations = [
     IllegalPlay.exceedsHeightLimit,
@@ -310,19 +308,18 @@ class UpwordsBoard {
     IllegalPlay.sameTileStacked,
     IllegalPlay.coversExistingWord,
     IllegalPlay.firstPlayDoesNotCoverCenter,
-    IllegalPlay.wordIsInvalid,
     IllegalPlay.onlyAddsPlural
   ];
+  private static wordValidations = [IllegalPlay.wordIsInvalid];
 
   constructor(wordList: string[], initialUBF?: IUpwordsBoardFormat) {
     this.moveHistory = [];
+    this.wordLookup = new Set(wordList.map((word) => word.toUpperCase()));
     if (initialUBF) {
       this.ubfBoard = initialUBF;
     } else {
       this.ubfBoard = UBFHelper.createEmptyBoard();
     }
-
-    IllegalPlay.init(wordList);
   }
 
   getUBF(): IUpwordsBoardFormat {
@@ -343,6 +340,15 @@ class UpwordsBoard {
     // Check: Play and Board validations
     for (const validation of UpwordsBoard.boardValidations) {
       const result = validation(this.ubfBoard, play);
+      if (result.isIllegal) {
+        return {
+          isValid: false,
+          error: result.error
+        };
+      }
+    }
+    for (const validation of UpwordsBoard.wordValidations) {
+      const result = validation(this.ubfBoard, play, this.wordLookup);
       if (result.isIllegal) {
         return {
           isValid: false,

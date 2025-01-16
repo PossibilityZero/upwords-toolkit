@@ -130,6 +130,27 @@ describe('UpwordsBoard', () => {
       const board = new UpwordsBoard(testWordList, testUBF);
       expect(board.getUBF()).toEqual(testUBF);
     });
+
+    it('should take the word list as case-insensitive', () => {
+      const board = new UpwordsBoard(['HELLO', 'world']);
+      expectValidMove(board.checkPlay(makePlay('HELLO', [4, 3], PlayDirection.Horizontal)));
+      expectValidMove(board.checkPlay(makePlay('WORLD', [4, 3], PlayDirection.Horizontal)));
+    });
+
+    it('should maintain different word lists for separate instances', () => {
+      const board1 = new UpwordsBoard(['hello']);
+      const board2 = new UpwordsBoard(['world']);
+      expectValidMove(board1.checkPlay(makePlay('HELLO', [4, 3], PlayDirection.Horizontal)));
+      expectValidMove(board2.checkPlay(makePlay('WORLD', [4, 3], PlayDirection.Horizontal)));
+      expectInvalidMoveWithErrorCode(
+        board1.checkPlay(makePlay('WORLD', [4, 3], PlayDirection.Horizontal)),
+        MoveErrorCode.InvalidWord
+      );
+      expectInvalidMoveWithErrorCode(
+        board2.checkPlay(makePlay('HELLO', [4, 3], PlayDirection.Horizontal)),
+        MoveErrorCode.InvalidWord
+      );
+    });
   });
 
   describe('playTiles', () => {
