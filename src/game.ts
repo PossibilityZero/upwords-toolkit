@@ -1,7 +1,5 @@
 import { UpwordsBoard, UpwordsPlay, IUpwordsBoardFormat, IMoveResult } from './board.js';
 import { TileSet, TileRack, TileBag } from './tiles.js';
-import { TWL06 } from '../data/wordList.js';
-import { prepareUpwordsWordList, defaultWordFilterOptions } from './words.js';
 
 type Player = {
   tiles: TileRack;
@@ -13,13 +11,15 @@ class UpwordsGame {
   currentPlayer: number;
   private board: UpwordsBoard;
   private manualTiles: boolean;
+  private wordList: string[];
   tileBag: TileBag;
   private players: Player[] = [];
 
-  constructor(playerCount = 1, manualTiles = false) {
+  constructor(wordList: string[], playerCount = 1, manualTiles = false) {
     this.manualTiles = manualTiles;
     this.playerCount = playerCount;
     this.currentPlayer = 0;
+    this.wordList = wordList;
     this.tileBag = new TileBag();
     for (let i = 0; i < playerCount; i++) {
       const newPlayer = { tiles: new TileRack(), score: 0 };
@@ -28,8 +28,13 @@ class UpwordsGame {
       }
       this.players.push(newPlayer);
     }
-    const filteredTWL06 = prepareUpwordsWordList(TWL06, defaultWordFilterOptions);
-    this.board = new UpwordsBoard(filteredTWL06.keptWords);
+    this.board = new UpwordsBoard(this.wordList);
+  }
+
+  isFinished(): boolean {
+    return (
+      this.tileBag.tileCount === 0 && this.players.some((player) => player.tiles.tileCount === 0)
+    );
   }
 
   playMove(play: UpwordsPlay): void {
@@ -52,6 +57,10 @@ class UpwordsGame {
       // Cycle to the next player
       this.currentPlayer = (this.currentPlayer + 1) % this.playerCount;
     }
+  }
+
+  skipTurn(): void {
+    this.currentPlayer = (this.currentPlayer + 1) % this.playerCount;
   }
 
   checkMove(play: UpwordsPlay, boardStateOnly = false): IMoveResult {
@@ -116,7 +125,7 @@ class UpwordsGame {
   getBoard(): UpwordsBoard {
     // TODO: Fix this method, side effect of messing up UpwordsBoard trie
     // Return a copy of the game board
-    return new UpwordsBoard(TWL06, this.board.getUBF());
+    return new UpwordsBoard(this.wordList, this.board.getUBF());
   }
 
   getTiles(player: number): TileRack {
@@ -130,7 +139,11 @@ class UpwordsGame {
 
   getScore(player: number): number {
     // Return the score for the specified player
-    return this.players[player]!.score;
+    if (!this.isFinished()) {
+      return this.players[player]!.score;
+    } else {
+      return this.players[player]!.score - this.players[player]!.tiles.tileCount * 5;
+    }
   }
 }
 
