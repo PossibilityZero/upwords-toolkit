@@ -145,6 +145,37 @@ class UpwordsGame {
       return this.players[player]!.score - this.players[player]!.tiles.tileCount * 5;
     }
   }
+
+  serialize(): string {
+    return JSON.stringify({
+      ubf: this.getUBF(),
+      tileBagString: this.tileBag.listTiles(),
+      manualTiles: this.manualTiles,
+      playerCount: this.playerCount,
+      currentPlayer: this.currentPlayer,
+      players: this.players.map((player) => ({
+        tilesString: player.tiles.listTiles(),
+        score: player.score
+      }))
+    });
+  }
+
+  static loadFromSerialized(wordList: string[], serialized: string): UpwordsGame {
+    const gameData = JSON.parse(serialized);
+    const loadedGame = new UpwordsGame(wordList, gameData.playerCount, gameData.manualTiles);
+    loadedGame.board = new UpwordsBoard(wordList, gameData.ubf);
+    loadedGame.tileBag.setTiles(TileSet.tilesFromString(gameData.tileBagString));
+    loadedGame.manualTiles = gameData.manualTiles;
+    loadedGame.playerCount = gameData.playerCount;
+    loadedGame.currentPlayer = gameData.currentPlayer;
+    loadedGame.players.length = 0;
+    gameData.players.forEach((player: { tilesString: string; score: number }) => {
+      const restoredPlayer = { tiles: new TileRack(), score: player.score };
+      restoredPlayer.tiles.setTiles(TileSet.tilesFromString(player.tilesString));
+      loadedGame.players.push(restoredPlayer);
+    });
+    return loadedGame;
+  }
 }
 
 export { UpwordsGame };
