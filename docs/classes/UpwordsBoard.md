@@ -24,7 +24,7 @@
 
 #### Defined in
 
-[board.ts:308](https://github.com/PossibilityZero/upwords-toolkit/blob/88bd741b283b4e85f6340d5666373c00631373bd/src/board.ts#L308)
+[board.ts:315](https://github.com/PossibilityZero/upwords-toolkit/blob/9fee09184064801be12a1db27ac8db805f22d623/src/board.ts#L315)
 
 ## Methods
 
@@ -42,7 +42,7 @@
 
 #### Defined in
 
-[board.ts:365](https://github.com/PossibilityZero/upwords-toolkit/blob/88bd741b283b4e85f6340d5666373c00631373bd/src/board.ts#L365)
+[board.ts:380](https://github.com/PossibilityZero/upwords-toolkit/blob/9fee09184064801be12a1db27ac8db805f22d623/src/board.ts#L380)
 
 ***
 
@@ -60,7 +60,7 @@
 
 #### Defined in
 
-[board.ts:369](https://github.com/PossibilityZero/upwords-toolkit/blob/88bd741b283b4e85f6340d5666373c00631373bd/src/board.ts#L369)
+[board.ts:384](https://github.com/PossibilityZero/upwords-toolkit/blob/9fee09184064801be12a1db27ac8db805f22d623/src/board.ts#L384)
 
 ***
 
@@ -74,7 +74,7 @@
 
 #### Defined in
 
-[board.ts:319](https://github.com/PossibilityZero/upwords-toolkit/blob/88bd741b283b4e85f6340d5666373c00631373bd/src/board.ts#L319)
+[board.ts:325](https://github.com/PossibilityZero/upwords-toolkit/blob/9fee09184064801be12a1db27ac8db805f22d623/src/board.ts#L325)
 
 ***
 
@@ -94,4 +94,4 @@
 
 #### Defined in
 
-[board.ts:347](https://github.com/PossibilityZero/upwords-toolkit/blob/88bd741b283b4e85f6340d5666373c00631373bd/src/board.ts#L347)
+[board.ts:362](https://github.com/PossibilityZero/upwords-toolkit/blob/9fee09184064801be12a1db27ac8db805f22d623/src/board.ts#L362)

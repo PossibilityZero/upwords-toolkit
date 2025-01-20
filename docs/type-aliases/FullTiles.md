@@ -10,4 +10,4 @@
 
 ## Defined in
 
-[tiles.ts:31](https://github.com/PossibilityZero/upwords-toolkit/blob/88bd741b283b4e85f6340d5666373c00631373bd/src/tiles.ts#L31)
+[tiles.ts:31](https://github.com/PossibilityZero/upwords-toolkit/blob/9fee09184064801be12a1db27ac8db805f22d623/src/tiles.ts#L31)

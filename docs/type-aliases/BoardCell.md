@@ -27,4 +27,4 @@ Properties: letter, coord, height
 
 ## Defined in
 
-[boardUtils.ts:15](https://github.com/PossibilityZero/upwords-toolkit/blob/88bd741b283b4e85f6340d5666373c00631373bd/src/boardUtils.ts#L15)
+[boardUtils.ts:15](https://github.com/PossibilityZero/upwords-toolkit/blob/9fee09184064801be12a1db27ac8db805f22d623/src/boardUtils.ts#L15)

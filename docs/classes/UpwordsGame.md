@@ -10,11 +10,15 @@
 
 ### new UpwordsGame()
 
-> **new UpwordsGame**(`playerCount`): [`UpwordsGame`](UpwordsGame.md)
+> **new UpwordsGame**(`wordList`, `playerCount`, `manualTiles`): [`UpwordsGame`](UpwordsGame.md)
 
 #### Parameters
 
+• **wordList**: `string`[]
+
 • **playerCount**: `number` = `1`
+
+• **manualTiles**: `boolean` = `false`
 
 #### Returns
 
@@ -22,7 +26,7 @@
 
 #### Defined in
 
-[game.ts:12](https://github.com/PossibilityZero/upwords-toolkit/blob/88bd741b283b4e85f6340d5666373c00631373bd/src/game.ts#L12)
+[game.ts:18](https://github.com/PossibilityZero/upwords-toolkit/blob/9fee09184064801be12a1db27ac8db805f22d623/src/game.ts#L18)
 
 ## Properties
 
@@ -32,7 +36,7 @@
 
 #### Defined in
 
-[game.ts:7](https://github.com/PossibilityZero/upwords-toolkit/blob/88bd741b283b4e85f6340d5666373c00631373bd/src/game.ts#L7)
+[game.ts:11](https://github.com/PossibilityZero/upwords-toolkit/blob/9fee09184064801be12a1db27ac8db805f22d623/src/game.ts#L11)
 
 ***
 
@@ -42,7 +46,7 @@
 
 #### Defined in
 
-[game.ts:6](https://github.com/PossibilityZero/upwords-toolkit/blob/88bd741b283b4e85f6340d5666373c00631373bd/src/game.ts#L6)
+[game.ts:10](https://github.com/PossibilityZero/upwords-toolkit/blob/9fee09184064801be12a1db27ac8db805f22d623/src/game.ts#L10)
 
 ***
 
@@ -52,21 +56,61 @@
 
 #### Defined in
 
-[game.ts:9](https://github.com/PossibilityZero/upwords-toolkit/blob/88bd741b283b4e85f6340d5666373c00631373bd/src/game.ts#L9)
+[game.ts:15](https://github.com/PossibilityZero/upwords-toolkit/blob/9fee09184064801be12a1db27ac8db805f22d623/src/game.ts#L15)
 
 ## Methods
 
-### getBoard()
+### checkMove()
 
-> **getBoard**(): [`IUpwordsBoardFormat`](../type-aliases/IUpwordsBoardFormat.md)
+> **checkMove**(`play`, `boardStateOnly`): `IMoveResult`
+
+#### Parameters
+
+• **play**: [`UpwordsPlay`](../type-aliases/UpwordsPlay.md)
+
+• **boardStateOnly**: `boolean` = `false`
 
 #### Returns
 
-[`IUpwordsBoardFormat`](../type-aliases/IUpwordsBoardFormat.md)
+`IMoveResult`
 
 #### Defined in
 
-[game.ts:32](https://github.com/PossibilityZero/upwords-toolkit/blob/88bd741b283b4e85f6340d5666373c00631373bd/src/game.ts#L32)
+[game.ts:66](https://github.com/PossibilityZero/upwords-toolkit/blob/9fee09184064801be12a1db27ac8db805f22d623/src/game.ts#L66)
+
+***
+
+### drawSpecificTiles()
+
+> **drawSpecificTiles**(`playerId`, `tiles`): `boolean`
+
+#### Parameters
+
+• **playerId**: `number`
+
+• **tiles**: `string`
+
+#### Returns
+
+`boolean`
+
+#### Defined in
+
+[game.ts:78](https://github.com/PossibilityZero/upwords-toolkit/blob/9fee09184064801be12a1db27ac8db805f22d623/src/game.ts#L78)
+
+***
+
+### getBoard()
+
+> **getBoard**(): [`UpwordsBoard`](UpwordsBoard.md)
+
+#### Returns
+
+[`UpwordsBoard`](UpwordsBoard.md)
+
+#### Defined in
+
+[game.ts:125](https://github.com/PossibilityZero/upwords-toolkit/blob/9fee09184064801be12a1db27ac8db805f22d623/src/game.ts#L125)
 
 ***
 
@@ -84,7 +128,7 @@
 
 #### Defined in
 
-[game.ts:46](https://github.com/PossibilityZero/upwords-toolkit/blob/88bd741b283b4e85f6340d5666373c00631373bd/src/game.ts#L46)
+[game.ts:140](https://github.com/PossibilityZero/upwords-toolkit/blob/9fee09184064801be12a1db27ac8db805f22d623/src/game.ts#L140)
 
 ***
 
@@ -98,7 +142,7 @@
 
 #### Defined in
 
-[game.ts:42](https://github.com/PossibilityZero/upwords-toolkit/blob/88bd741b283b4e85f6340d5666373c00631373bd/src/game.ts#L42)
+[game.ts:136](https://github.com/PossibilityZero/upwords-toolkit/blob/9fee09184064801be12a1db27ac8db805f22d623/src/game.ts#L136)
 
 ***
 
@@ -116,7 +160,35 @@
 
 #### Defined in
 
-[game.ts:37](https://github.com/PossibilityZero/upwords-toolkit/blob/88bd741b283b4e85f6340d5666373c00631373bd/src/game.ts#L37)
+[game.ts:131](https://github.com/PossibilityZero/upwords-toolkit/blob/9fee09184064801be12a1db27ac8db805f22d623/src/game.ts#L131)
+
+***
+
+### getUBF()
+
+> **getUBF**(): [`IUpwordsBoardFormat`](../type-aliases/IUpwordsBoardFormat.md)
+
+#### Returns
+
+[`IUpwordsBoardFormat`](../type-aliases/IUpwordsBoardFormat.md)
+
+#### Defined in
+
+[game.ts:120](https://github.com/PossibilityZero/upwords-toolkit/blob/9fee09184064801be12a1db27ac8db805f22d623/src/game.ts#L120)
+
+***
+
+### isFinished()
+
+> **isFinished**(): `boolean`
+
+#### Returns
+
+`boolean`
+
+#### Defined in
+
+[game.ts:34](https://github.com/PossibilityZero/upwords-toolkit/blob/9fee09184064801be12a1db27ac8db805f22d623/src/game.ts#L34)
 
 ***
 
@@ -134,4 +206,38 @@
 
 #### Defined in
 
-[game.ts:23](https://github.com/PossibilityZero/upwords-toolkit/blob/88bd741b283b4e85f6340d5666373c00631373bd/src/game.ts#L23)
+[game.ts:40](https://github.com/PossibilityZero/upwords-toolkit/blob/9fee09184064801be12a1db27ac8db805f22d623/src/game.ts#L40)
+
+***
+
+### returnSpecificTiles()
+
+> **returnSpecificTiles**(`playerId`, `tiles`): `boolean`
+
+#### Parameters
+
+• **playerId**: `number`
+
+• **tiles**: `string`
+
+#### Returns
+
+`boolean`
+
+#### Defined in
+
+[game.ts:94](https://github.com/PossibilityZero/upwords-toolkit/blob/9fee09184064801be12a1db27ac8db805f22d623/src/game.ts#L94)
+
+***
+
+### skipTurn()
+
+> **skipTurn**(): `void`
+
+#### Returns
+
+`void`
+
+#### Defined in
+
+[game.ts:62](https://github.com/PossibilityZero/upwords-toolkit/blob/9fee09184064801be12a1db27ac8db805f22d623/src/game.ts#L62)

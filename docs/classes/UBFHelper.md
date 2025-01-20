@@ -29,7 +29,7 @@ Instead, a new copy is created for each operation.
 
 #### Defined in
 
-[boardUtils.ts:42](https://github.com/PossibilityZero/upwords-toolkit/blob/88bd741b283b4e85f6340d5666373c00631373bd/src/boardUtils.ts#L42)
+[boardUtils.ts:42](https://github.com/PossibilityZero/upwords-toolkit/blob/9fee09184064801be12a1db27ac8db805f22d623/src/boardUtils.ts#L42)
 
 ## Methods
 
@@ -54,7 +54,34 @@ true if the board is empty
 
 #### Defined in
 
-[boardUtils.ts:302](https://github.com/PossibilityZero/upwords-toolkit/blob/88bd741b283b4e85f6340d5666373c00631373bd/src/boardUtils.ts#L302)
+[boardUtils.ts:302](https://github.com/PossibilityZero/upwords-toolkit/blob/9fee09184064801be12a1db27ac8db805f22d623/src/boardUtils.ts#L302)
+
+***
+
+### calculateWordScore()
+
+> `static` **calculateWordScore**(`word`): `number`
+
+Given a single board word (array of BoardCells), calculates the score of the word.
+* 1 point for each tile height in the word
+* Double base score if all tiles are height 1
+* +2 points if the word contains the "Qu" tile and all tiles are height 1
+
+#### Parameters
+
+• **word**: [`BoardWord`](../type-aliases/BoardWord.md)
+
+The word to calculate the score for
+
+#### Returns
+
+`number`
+
+The score of the word
+
+#### Defined in
+
+[boardUtils.ts:315](https://github.com/PossibilityZero/upwords-toolkit/blob/9fee09184064801be12a1db27ac8db805f22d623/src/boardUtils.ts#L315)
 
 ***
 
@@ -82,7 +109,7 @@ true if coord1 and coord2 have the same x and y values
 
 #### Defined in
 
-[boardUtils.ts:152](https://github.com/PossibilityZero/upwords-toolkit/blob/88bd741b283b4e85f6340d5666373c00631373bd/src/boardUtils.ts#L152)
+[boardUtils.ts:152](https://github.com/PossibilityZero/upwords-toolkit/blob/9fee09184064801be12a1db27ac8db805f22d623/src/boardUtils.ts#L152)
 
 ***
 
@@ -106,7 +133,7 @@ A deep copy of the input board
 
 #### Defined in
 
-[boardUtils.ts:69](https://github.com/PossibilityZero/upwords-toolkit/blob/88bd741b283b4e85f6340d5666373c00631373bd/src/boardUtils.ts#L69)
+[boardUtils.ts:69](https://github.com/PossibilityZero/upwords-toolkit/blob/9fee09184064801be12a1db27ac8db805f22d623/src/boardUtils.ts#L69)
 
 ***
 
@@ -124,7 +151,7 @@ An empty 10 x 10 Upwords board
 
 #### Defined in
 
-[boardUtils.ts:48](https://github.com/PossibilityZero/upwords-toolkit/blob/88bd741b283b4e85f6340d5666373c00631373bd/src/boardUtils.ts#L48)
+[boardUtils.ts:48](https://github.com/PossibilityZero/upwords-toolkit/blob/9fee09184064801be12a1db27ac8db805f22d623/src/boardUtils.ts#L48)
 
 ***
 
@@ -160,7 +187,7 @@ An array of BoardCell objects representing the word
 
 #### Defined in
 
-[boardUtils.ts:368](https://github.com/PossibilityZero/upwords-toolkit/blob/88bd741b283b4e85f6340d5666373c00631373bd/src/boardUtils.ts#L368)
+[boardUtils.ts:390](https://github.com/PossibilityZero/upwords-toolkit/blob/9fee09184064801be12a1db27ac8db805f22d623/src/boardUtils.ts#L390)
 
 ***
 
@@ -188,7 +215,7 @@ Excludes out-of-bounds coordinates.
 
 #### Defined in
 
-[boardUtils.ts:179](https://github.com/PossibilityZero/upwords-toolkit/blob/88bd741b283b4e85f6340d5666373c00631373bd/src/boardUtils.ts#L179)
+[boardUtils.ts:179](https://github.com/PossibilityZero/upwords-toolkit/blob/9fee09184064801be12a1db27ac8db805f22d623/src/boardUtils.ts#L179)
 
 ***
 
@@ -214,7 +241,7 @@ Excludes out-of-bounds coordinates.
 
 #### Defined in
 
-[boardUtils.ts:164](https://github.com/PossibilityZero/upwords-toolkit/blob/88bd741b283b4e85f6340d5666373c00631373bd/src/boardUtils.ts#L164)
+[boardUtils.ts:164](https://github.com/PossibilityZero/upwords-toolkit/blob/9fee09184064801be12a1db27ac8db805f22d623/src/boardUtils.ts#L164)
 
 ***
 
@@ -243,7 +270,7 @@ The height of the tile at the given coordinate
 
 #### Defined in
 
-[boardUtils.ts:103](https://github.com/PossibilityZero/upwords-toolkit/blob/88bd741b283b4e85f6340d5666373c00631373bd/src/boardUtils.ts#L103)
+[boardUtils.ts:103](https://github.com/PossibilityZero/upwords-toolkit/blob/9fee09184064801be12a1db27ac8db805f22d623/src/boardUtils.ts#L103)
 
 ***
 
@@ -272,7 +299,7 @@ The letter of the tile at the given coordinate
 
 #### Defined in
 
-[boardUtils.ts:119](https://github.com/PossibilityZero/upwords-toolkit/blob/88bd741b283b4e85f6340d5666373c00631373bd/src/boardUtils.ts#L119)
+[boardUtils.ts:119](https://github.com/PossibilityZero/upwords-toolkit/blob/9fee09184064801be12a1db27ac8db805f22d623/src/boardUtils.ts#L119)
 
 ***
 
@@ -311,7 +338,7 @@ An array of strings representing the line of play
 
 #### Defined in
 
-[boardUtils.ts:281](https://github.com/PossibilityZero/upwords-toolkit/blob/88bd741b283b4e85f6340d5666373c00631373bd/src/boardUtils.ts#L281)
+[boardUtils.ts:281](https://github.com/PossibilityZero/upwords-toolkit/blob/9fee09184064801be12a1db27ac8db805f22d623/src/boardUtils.ts#L281)
 
 ***
 
@@ -340,7 +367,7 @@ The orthogonal PlayDirection
 
 #### Defined in
 
-[boardUtils.ts:201](https://github.com/PossibilityZero/upwords-toolkit/blob/88bd741b283b4e85f6340d5666373c00631373bd/src/boardUtils.ts#L201)
+[boardUtils.ts:201](https://github.com/PossibilityZero/upwords-toolkit/blob/9fee09184064801be12a1db27ac8db805f22d623/src/boardUtils.ts#L201)
 
 ***
 
@@ -369,7 +396,7 @@ A string representing the tile, in the format 'height letter'. eg. '2T'
 
 #### Defined in
 
-[boardUtils.ts:82](https://github.com/PossibilityZero/upwords-toolkit/blob/88bd741b283b4e85f6340d5666373c00631373bd/src/boardUtils.ts#L82)
+[boardUtils.ts:82](https://github.com/PossibilityZero/upwords-toolkit/blob/9fee09184064801be12a1db27ac8db805f22d623/src/boardUtils.ts#L82)
 
 ***
 
@@ -397,7 +424,7 @@ An array of words formed by the play
 
 #### Defined in
 
-[boardUtils.ts:408](https://github.com/PossibilityZero/upwords-toolkit/blob/88bd741b283b4e85f6340d5666373c00631373bd/src/boardUtils.ts#L408)
+[boardUtils.ts:430](https://github.com/PossibilityZero/upwords-toolkit/blob/9fee09184064801be12a1db27ac8db805f22d623/src/boardUtils.ts#L430)
 
 ***
 
@@ -429,7 +456,7 @@ A new coordinate that is offset by the given amount in the given direction
 
 #### Defined in
 
-[boardUtils.ts:135](https://github.com/PossibilityZero/upwords-toolkit/blob/88bd741b283b4e85f6340d5666373c00631373bd/src/boardUtils.ts#L135)
+[boardUtils.ts:135](https://github.com/PossibilityZero/upwords-toolkit/blob/9fee09184064801be12a1db27ac8db805f22d623/src/boardUtils.ts#L135)
 
 ***
 
@@ -461,7 +488,7 @@ A new board state with the tile placed
 
 #### Defined in
 
-[boardUtils.ts:215](https://github.com/PossibilityZero/upwords-toolkit/blob/88bd741b283b4e85f6340d5666373c00631373bd/src/boardUtils.ts#L215)
+[boardUtils.ts:215](https://github.com/PossibilityZero/upwords-toolkit/blob/9fee09184064801be12a1db27ac8db805f22d623/src/boardUtils.ts#L215)
 
 ***
 
@@ -489,7 +516,7 @@ A new board state with the tiles placed
 
 #### Defined in
 
-[boardUtils.ts:255](https://github.com/PossibilityZero/upwords-toolkit/blob/88bd741b283b4e85f6340d5666373c00631373bd/src/boardUtils.ts#L255)
+[boardUtils.ts:255](https://github.com/PossibilityZero/upwords-toolkit/blob/9fee09184064801be12a1db27ac8db805f22d623/src/boardUtils.ts#L255)
 
 ***
 
@@ -518,4 +545,4 @@ The score of the play
 
 #### Defined in
 
-[boardUtils.ts:314](https://github.com/PossibilityZero/upwords-toolkit/blob/88bd741b283b4e85f6340d5666373c00631373bd/src/boardUtils.ts#L314)
+[boardUtils.ts:343](https://github.com/PossibilityZero/upwords-toolkit/blob/9fee09184064801be12a1db27ac8db805f22d623/src/boardUtils.ts#L343)

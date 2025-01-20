@@ -27,3 +27,12 @@
 - [Letter](type-aliases/Letter.md)
 - [Tiles](type-aliases/Tiles.md)
 - [UpwordsPlay](type-aliases/UpwordsPlay.md)
+
+## Variables
+
+- [defaultTileCounts](variables/defaultTileCounts.md)
+- [defaultWordFilterOptions](variables/defaultWordFilterOptions.md)
+
+## Functions
+
+- [prepareUpwordsWordList](functions/prepareUpwordsWordList.md)
