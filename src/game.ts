@@ -7,38 +7,46 @@ type Player = {
 };
 
 class UpwordsGame {
-  playerCount: number;
-  currentPlayer: number;
-  private board: UpwordsBoard;
-  private manualTiles: boolean;
-  private wordList: string[];
-  tileBag: TileBag;
-  private players: Player[] = [];
+  #playerCount: number;
+  #currentPlayer: number;
+  #board: UpwordsBoard;
+  #manualTiles: boolean;
+  #wordList: string[];
+  #tileBag: TileBag;
+  #players: Player[] = [];
 
   constructor(wordList: string[], playerCount = 1, manualTiles = false) {
-    this.manualTiles = manualTiles;
-    this.playerCount = playerCount;
-    this.currentPlayer = 0;
-    this.wordList = wordList;
-    this.tileBag = new TileBag();
+    this.#manualTiles = manualTiles;
+    this.#playerCount = playerCount;
+    this.#currentPlayer = 0;
+    this.#wordList = wordList;
+    this.#tileBag = new TileBag();
     for (let i = 0; i < playerCount; i++) {
       const newPlayer = { tiles: new TileRack(), score: 0 };
-      if (!this.manualTiles) {
+      if (!this.#manualTiles) {
         this.#drawIntoRack(newPlayer, true);
       }
-      this.players.push(newPlayer);
+      this.#players.push(newPlayer);
     }
-    this.board = new UpwordsBoard(this.wordList);
+    this.#board = new UpwordsBoard(this.#wordList);
+  }
+
+  get currentPlayer(): number {
+    return this.#currentPlayer;
+  }
+
+  get playerCount(): number {
+    return this.#playerCount;
   }
 
   isFinished(): boolean {
     return (
-      this.tileBag.tileCount === 0 && this.players.some((player) => player.tiles.tileCount === 0)
+      this.#tileBag.tileCount === 0 && this.#players.some((player) => player.tiles.tileCount === 0)
     );
   }
 
   playMove(play: UpwordsPlay): void {
-    const player = this.players[this.currentPlayer];
+    const player = this.#players[this.#currentPlayer];
     if (!player) {
       throw new Error('Player does not exist');
     }
@@ -47,24 +55,24 @@ class UpwordsGame {
       return;
     }
 
-    const playResult = this.board.playTiles(play);
+    const playResult = this.#board.playTiles(play);
     if (playResult.isValid) {
       player.tiles.removeTiles(tiles);
       player.score += playResult.points!;
-      if (!this.manualTiles) {
+      if (!this.#manualTiles) {
         this.#drawIntoRack(player);
       }
       // Cycle to the next player
-      this.currentPlayer = (this.currentPlayer + 1) % this.playerCount;
+      this.#currentPlayer = (this.#currentPlayer + 1) % this.#playerCount;
     }
   }
 
   skipTurn(): void {
-    this.currentPlayer = (this.currentPlayer + 1) % this.playerCount;
+    this.#currentPlayer = (this.#currentPlayer + 1) % this.#playerCount;
   }
 
   checkMove(play: UpwordsPlay, boardStateOnly = false): IMoveResult {
-    const player = this.players[this.currentPlayer];
+    const player = this.#players[this.#currentPlayer];
     if (!player) {
       throw new Error('Player does not exist');
     }
@@ -72,18 +80,18 @@ class UpwordsGame {
     if (!player.tiles.hasTiles(tiles) && !boardStateOnly) {
       return { isValid: false, points: 0 };
     }
-    return this.board.checkPlay(play);
+    return this.#board.checkPlay(play);
   }
 
   drawSpecificTiles(playerId: number, tiles: string): boolean {
-    const player = this.players[playerId];
+    const player = this.#players[playerId];
     if (!player) {
       return false;
     }
     const playerTiles = player.tiles;
     const tileSet = TileSet.tilesFromString(tiles);
-    if (this.tileBag.hasTiles(tileSet)) {
-      this.tileBag.removeTiles(tileSet);
+    if (this.#tileBag.hasTiles(tileSet)) {
+      this.#tileBag.removeTiles(tileSet);
       playerTiles.addTiles(tileSet);
       return true;
     } else {
@@ -92,7 +100,7 @@ class UpwordsGame {
   }
 
   returnSpecificTiles(playerId: number, tiles: string): boolean {
-    const player = this.players[playerId];
+    const player = this.#players[playerId];
     if (!player) {
       return false;
     }
@@ -100,7 +108,7 @@ class UpwordsGame {
     const tileSet = TileSet.tilesFromString(tiles);
     if (playerTiles.hasTiles(tileSet)) {
       playerTiles.removeTiles(tileSet);
-      this.tileBag.addTiles(tileSet);
+      this.#tileBag.addTiles(tileSet);
       return true;
     } else {
       return false;
@@ -109,70 +117,85 @@ class UpwordsGame {
 
   #drawIntoRack(player: Player, firstDraw = false): void {
     if (firstDraw) {
-      player.tiles.addTiles(this.tileBag.drawRandomConsonant());
-      player.tiles.addTiles(this.tileBag.drawRandomVowel());
+      player.tiles.addTiles(this.#tileBag.drawRandomConsonant());
+      player.tiles.addTiles(this.#tileBag.drawRandomVowel());
     }
-    while (player.tiles.getMissingTiles() > 0 && this.tileBag.tileCount > 0) {
-      player.tiles.addTiles(this.tileBag.drawRandomTile());
+    while (player.tiles.getMissingTiles() > 0 && this.#tileBag.tileCount > 0) {
+      player.tiles.addTiles(this.#tileBag.drawRandomTile());
     }
   }
 
   getUBF(): IUpwordsBoardFormat {
     // Return a UBF copy of the board
-    return this.board.getUBF();
+    return this.#board.getUBF();
   }
 
   getBoard(): UpwordsBoard {
     // TODO: Fix this method, side effect of messing up UpwordsBoard trie
     // Return a copy of the game board
-    return new UpwordsBoard(this.wordList, this.board.getUBF());
+    return new UpwordsBoard(this.#wordList, this.#board.getUBF());
   }
 
   getTiles(player: number): TileRack {
     // Return the tiles for the specified player
-    return this.players[player]!.tiles;
+    return this.#players[player]!.tiles;
   }
 
   getTileBag(): TileBag {
-    return this.tileBag;
+    return this.#tileBag;
   }
 
   getScore(player: number): number {
     // Return the score for the specified player
     if (!this.isFinished()) {
-      return this.players[player]!.score;
+      return this.#players[player]!.score;
     } else {
-      return this.players[player]!.score - this.players[player]!.tiles.tileCount * 5;
+      return this.#players[player]!.score - this.#players[player]!.tiles.tileCount * 5;
     }
   }
 
   serialize(): string {
     return JSON.stringify({
       ubf: this.getUBF(),
-      tileBagString: this.tileBag.listTiles(),
-      manualTiles: this.manualTiles,
-      playerCount: this.playerCount,
-      currentPlayer: this.currentPlayer,
-      players: this.players.map((player) => ({
+      tileBagString: this.#tileBag.listTiles(),
+      manualTiles: this.#manualTiles,
+      playerCount: this.#playerCount,
+      currentPlayer: this.#currentPlayer,
+      players: this.#players.map((player) => ({
         tilesString: player.tiles.listTiles(),
         score: player.score
       }))
     });
   }
 
-  static loadFromSerialized(wordList: string[], serialized: string): UpwordsGame {
+  loadGameFromSerialized(serialized: string): void {
     const gameData = JSON.parse(serialized);
-    const loadedGame = new UpwordsGame(wordList, gameData.playerCount, gameData.manualTiles);
-    loadedGame.board = new UpwordsBoard(wordList, gameData.ubf);
-    loadedGame.tileBag.setTiles(TileSet.tilesFromString(gameData.tileBagString));
-    loadedGame.manualTiles = gameData.manualTiles;
-    loadedGame.playerCount = gameData.playerCount;
-    loadedGame.currentPlayer = gameData.currentPlayer;
-    loadedGame.players.length = 0;
+    this.#board = new UpwordsBoard(this.#wordList, gameData.ubf);
+    this.#tileBag.setTiles(TileSet.tilesFromString(gameData.tileBagString));
+    this.#manualTiles = gameData.manualTiles;
+    this.#playerCount = gameData.playerCount;
+    this.#currentPlayer = gameData.currentPlayer;
+    this.#players.length = 0;
     gameData.players.forEach((player: { tilesString: string; score: number }) => {
       const restoredPlayer = { tiles: new TileRack(), score: player.score };
       restoredPlayer.tiles.setTiles(TileSet.tilesFromString(player.tilesString));
-      loadedGame.players.push(restoredPlayer);
+      this.#players.push(restoredPlayer);
+    });
+  }
+
+  static newGameFromSerialized(wordList: string[], serialized: string): UpwordsGame {
+    const gameData = JSON.parse(serialized);
+    const loadedGame = new UpwordsGame(wordList, gameData.playerCount, gameData.manualTiles);
+    loadedGame.#board = new UpwordsBoard(wordList, gameData.ubf);
+    loadedGame.#tileBag.setTiles(TileSet.tilesFromString(gameData.tileBagString));
+    loadedGame.#manualTiles = gameData.manualTiles;
+    loadedGame.#playerCount = gameData.playerCount;
+    loadedGame.#currentPlayer = gameData.currentPlayer;
+    loadedGame.#players.length = 0;
+    gameData.players.forEach((player: { tilesString: string; score: number }) => {
+      const restoredPlayer = { tiles: new TileRack(), score: player.score };
+      restoredPlayer.tiles.setTiles(TileSet.tilesFromString(player.tilesString));
+      loadedGame.#players.push(restoredPlayer);
     });
     return loadedGame;
   }

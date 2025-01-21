@@ -1,6 +1,7 @@
 import { UpwordsGame } from './game';
 import { UpwordsPlay, PlayDirection, UBFHelper } from './boardUtils';
 import { MoveErrorCode } from './board';
+import { TileBag } from './tiles';
 
 describe('UpwordsGame', () => {
   const defaultStarterMove: UpwordsPlay = {
@@ -278,7 +279,7 @@ describe('UpwordsGame', () => {
 
       describe('getTileBag should return the tile bag', () => {
         const game = new UpwordsGame(testWordList);
-        expect(game.tileBag).toBeDefined();
+        expect(game.getTileBag()).toBeInstanceOf(TileBag);
       });
     });
 
@@ -290,8 +291,8 @@ describe('UpwordsGame', () => {
         });
       });
 
-      describe('loadFromSaved', () => {
-        it('should load a game from a string representation', () => {
+      describe('newGameFromSerialized', () => {
+        it('should create a new game from a string representation', () => {
           const game = new UpwordsGame(testWordList, 2, true);
           game.getTileBag().removeTiles({ H: 1, E: 3, L: 2, O: 1 });
           game.getTiles(0).addTiles({ H: 1, E: 3, L: 2, O: 1 });
@@ -301,12 +302,35 @@ describe('UpwordsGame', () => {
           const serialized = game.serialize();
 
           game.playMove(defaultSecondMove);
-          const loadedGame = UpwordsGame.loadFromSerialized(testWordList, serialized);
+          const loadedGame = UpwordsGame.newGameFromSerialized(testWordList, serialized);
           expect(loadedGame.getScore(0)).toBe(10);
           expect(loadedGame.getScore(1)).toBe(0);
           expect(loadedGame.currentPlayer).toBe(1);
           expect(loadedGame.getTiles(0).tileCount).toBe(2);
           expect(loadedGame.getTiles(1).tileCount).toBe(7);
+        });
+      });
+
+      describe('loadFromSerialized', () => {
+        it('should load a game from a string representation', () => {
+          const game = new UpwordsGame(testWordList, 2, true);
+          game.getTileBag().removeTiles({ H: 1, E: 3, L: 2, O: 1 });
+          game.getTiles(0).addTiles({ H: 1, E: 3, L: 2, O: 1 });
+          game.getTileBag().removeTiles({ W: 1, R: 2, L: 1, D: 2, A: 1 });
+          game.getTiles(1).addTiles({ W: 1, R: 2, L: 1, D: 2, A: 1 });
+          game.playMove(defaultStarterMove);
+          const serialized = game.serialize();
+          game.playMove(defaultSecondMove);
+          game.drawSpecificTiles(0, 'ABCDE');
+
+          game.loadGameFromSerialized(serialized);
+          // expect the game to be in the state before the second move
+          expect(game.getScore(0)).toBe(10);
+          expect(game.getScore(1)).toBe(0);
+          expect(game.currentPlayer).toBe(1);
+          expect(game.getTiles(0).tileCount).toBe(2);
+          expect(game.getTiles(1).tileCount).toBe(7);
+          expect(game.getTileBag().tileCount).toBe(86);
         });
       });
     });
