@@ -171,6 +171,7 @@ class UpwordsGame {
   loadGameFromSerialized(serialized: string): void {
     const gameData = JSON.parse(serialized);
     this.#board = new UpwordsBoard(this.#wordList, gameData.ubf);
+    this.#tileBag.deleteAllTiles();
     this.#tileBag.setTiles(TileSet.tilesFromString(gameData.tileBagString));
     this.#manualTiles = gameData.manualTiles;
     this.#playerCount = gameData.playerCount;
@@ -184,19 +185,8 @@ class UpwordsGame {
   }
 
   static newGameFromSerialized(wordList: string[], serialized: string): UpwordsGame {
-    const gameData = JSON.parse(serialized);
-    const loadedGame = new UpwordsGame(wordList, gameData.playerCount, gameData.manualTiles);
-    loadedGame.#board = new UpwordsBoard(wordList, gameData.ubf);
-    loadedGame.#tileBag.setTiles(TileSet.tilesFromString(gameData.tileBagString));
-    loadedGame.#manualTiles = gameData.manualTiles;
-    loadedGame.#playerCount = gameData.playerCount;
-    loadedGame.#currentPlayer = gameData.currentPlayer;
-    loadedGame.#players.length = 0;
-    gameData.players.forEach((player: { tilesString: string; score: number }) => {
-      const restoredPlayer = { tiles: new TileRack(), score: player.score };
-      restoredPlayer.tiles.setTiles(TileSet.tilesFromString(player.tilesString));
-      loadedGame.#players.push(restoredPlayer);
-    });
+    const loadedGame = new UpwordsGame(wordList);
+    loadedGame.loadGameFromSerialized(serialized);
     return loadedGame;
   }
 }
