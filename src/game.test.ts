@@ -366,5 +366,42 @@ describe('UpwordsGame', () => {
         });
       });
     });
+
+    describe('undoTurn', () => {
+      it('should undo the last turn', () => {
+        const game = new UpwordsGame(testWordList, 2, true);
+        game.getTileBag().removeTiles({ H: 1, E: 3, L: 2, O: 1 });
+        game.getTiles(0).addTiles({ H: 1, E: 3, L: 2, O: 1 });
+        const playerTilesBeforeMove = game.getTiles(0).listTiles();
+        const tileBagBeforeMove = game.getTileBag().listTiles();
+        game.playMove(defaultStarterMove);
+        expect(game.currentPlayer).toBe(1);
+        expect(game.getTiles(0).getTiles()).toEqual({ E: 2 });
+        expect(game.getScore(0)).toBe(10);
+        game.drawSpecificTiles(0, 'WORLD');
+        expect(game.getTileBag().tileCount).toBe(88);
+        game.undoTurn();
+        expect(game.currentPlayer).toBe(0);
+        expect(game.getTileBag().listTiles()).toEqual(tileBagBeforeMove);
+        expect(game.getScore(0)).toBe(0);
+        expect(game.getTiles(0).listTiles()).toEqual(playerTilesBeforeMove);
+        expect(game.getUBF()).toEqual(new UpwordsGame(testWordList).getUBF());
+      });
+
+      it('should undo skipped turns', () => {
+        const game = new UpwordsGame(testWordList, 2, true);
+        game.skipTurn();
+        game.skipTurn();
+        game.undoTurn();
+        expect(game.currentPlayer).toBe(1);
+        game.undoTurn();
+        expect(game.currentPlayer).toBe(0);
+        // idempotent after reaching the first turn
+        game.undoTurn();
+        expect(game.currentPlayer).toBe(0);
+        game.undoTurn();
+        expect(game.currentPlayer).toBe(0);
+      });
+    });
   });
 });

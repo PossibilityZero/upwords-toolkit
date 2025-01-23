@@ -14,6 +14,12 @@ class UpwordsGame {
   #wordList: string[];
   #tileBag: TileBag;
   #players: Player[] = [];
+  #turnHistory: {
+    play: UpwordsPlay | null;
+    points: number;
+    playerTilesState: string[];
+    tileBagState: string;
+  }[] = [];
 
   constructor(wordList: string[], playerCount = 1, manualTiles = false) {
     this.#manualTiles = manualTiles;
@@ -57,6 +63,8 @@ class UpwordsGame {
 
     const playResult = this.#board.playTiles(play);
     if (playResult.isValid) {
+      const playerTilesState = this.#players.map((player) => player.tiles.listTiles());
+      const tileBagState = this.#tileBag.listTiles();
       player.tiles.removeTiles(tiles);
       player.score += playResult.points!;
       if (!this.#manualTiles) {
@@ -64,11 +72,44 @@ class UpwordsGame {
       }
       // Cycle to the next player
       this.#currentPlayer = (this.#currentPlayer + 1) % this.#playerCount;
+      this.#turnHistory.push({
+        play,
+        points: playResult.points || 0,
+        playerTilesState,
+        tileBagState
+      });
     }
   }
 
   skipTurn(): void {
+    const playerTilesState = this.#players.map((player) => player.tiles.listTiles());
+    const tileBagState = this.#tileBag.listTiles();
     this.#currentPlayer = (this.#currentPlayer + 1) % this.#playerCount;
+    this.#turnHistory.push({
+      play: null,
+      points: 0,
+      playerTilesState,
+      tileBagState
+    });
+  }
+
+  undoTurn(): void {
+    const lastPlay = this.#turnHistory.pop();
+    if (!lastPlay) {
+      return;
+    }
+    this.#currentPlayer = (this.#currentPlayer - 1 + this.#playerCount) % this.#playerCount;
+    this.#players[this.#currentPlayer]!.score -= lastPlay.points;
+    this.#players.forEach((player, i) => {
+      const playerTiles = TileSet.tilesFromString(lastPlay.playerTilesState[i]!);
+      player.tiles.deleteAllTiles();
+      player.tiles.setTiles(playerTiles);
+    });
+    this.#tileBag.deleteAllTiles();
+    this.#tileBag.setTiles(TileSet.tilesFromString(lastPlay.tileBagState));
+    if (lastPlay.play) {
+      this.#board.undoMove();
+    }
   }
 
   checkMove(play: UpwordsPlay, boardStateOnly = false): IMoveResult {
