@@ -299,6 +299,7 @@ class IllegalPlay {
 class UpwordsBoard {
   private ubfBoard: IUpwordsBoardFormat;
   private moveHistory: IMoveResult[];
+  private boardHistory: IUpwordsBoardFormat[];
   private wordLookup: WordLookup;
   private static playValidations = [IllegalPlay.playOutOfBounds];
   private static boardValidations = [
@@ -314,6 +315,7 @@ class UpwordsBoard {
 
   constructor(wordList: string[], initialUBF?: IUpwordsBoardFormat) {
     this.moveHistory = [];
+    this.boardHistory = [];
     this.wordLookup = new Set(wordList.map((word) => word.toUpperCase()));
     if (initialUBF) {
       this.ubfBoard = initialUBF;
@@ -371,6 +373,7 @@ class UpwordsBoard {
       isValid: true
     };
     if (!checkOnly) {
+      this.boardHistory.push(UBFHelper.copyBoard(this.ubfBoard));
       this.ubfBoard = UBFHelper.placeTiles(this.ubfBoard, play);
       this.moveHistory.push(moveResult);
     }
@@ -387,6 +390,13 @@ class UpwordsBoard {
       throw new RangeError(`History out-of-range: can't go back ${numberOfMovesBack} moves`);
     }
     return lastMove;
+  }
+
+  undoMove(): void {
+    if (this.boardHistory.length > 0) {
+      this.ubfBoard = this.boardHistory.pop()!;
+      this.moveHistory.pop();
+    }
   }
 }
 

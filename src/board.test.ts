@@ -656,6 +656,113 @@ describe('UpwordsBoard', () => {
       });
     });
 
+    describe('undoMove', () => {
+      it('should restore the board to its previous state', () => {
+        const board = new UpwordsBoard(testWordList);
+        board.playTiles(makePlay('HELLO', [4, 3], PlayDirection.Horizontal));
+        board.undoMove();
+        expect(board.getUBF()).toEqual([
+          ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+          ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+          ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+          ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+          ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+          ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+          ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+          ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+          ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+          ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ']
+        ]);
+      });
+
+      it('should be able to undo multiple moves', () => {
+        const board = new UpwordsBoard(testWordList);
+        const boardState0 = [
+          ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+          ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+          ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+          ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+          ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+          ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+          ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+          ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+          ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+          ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ']
+        ];
+
+        board.playTiles(makePlay('HELLO', [4, 3], PlayDirection.Horizontal));
+        const boardState1 = [
+          ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+          ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+          ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+          ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+          ['0 ', '0 ', '0 ', '1H', '1E', '1L', '1L', '1O', '0 ', '0 '],
+          ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+          ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+          ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+          ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+          ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ']
+        ];
+
+        board.playTiles(makePlay('TEST', [2, 7], PlayDirection.Vertical));
+        const boardState2 = [
+          ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+          ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+          ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '1T', '0 ', '0 '],
+          ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '1E', '0 ', '0 '],
+          ['0 ', '0 ', '0 ', '1H', '1E', '1L', '1L', '2S', '0 ', '0 '],
+          ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '1T', '0 ', '0 '],
+          ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+          ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+          ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+          ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ']
+        ];
+
+        expect(board.getUBF()).toEqual(boardState2);
+        board.undoMove();
+        expect(board.getUBF()).toEqual(boardState1);
+        board.undoMove();
+        expect(board.getUBF()).toEqual(boardState0);
+      });
+
+      it('should be idempotent at initial state', () => {
+        const initialUBF = [
+          ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+          ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '1A', '0 ', '0 ', '0 '],
+          ['0 ', '0 ', '0 ', '0 ', '1T', '1O', '1P', '0 ', '0 ', '0 '],
+          ['0 ', '0 ', '0 ', '0 ', '1R', '0 ', '1E', '0 ', '0 ', '0 '],
+          ['0 ', '0 ', '0 ', '1H', '1I', '1S', '0 ', '0 ', '0 ', '0 '],
+          ['0 ', '0 ', '0 ', '0 ', '1P', '0 ', '0 ', '0 ', '0 ', '0 '],
+          ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+          ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+          ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+          ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ']
+        ];
+        const board = new UpwordsBoard(testWordList, initialUBF);
+        board.undoMove();
+        expect(board.getUBF()).toEqual(initialUBF);
+        board.undoMove();
+        expect(board.getUBF()).toEqual(initialUBF);
+      });
+
+      it('should remove the last move from the play history', () => {
+        const board = new UpwordsBoard(testWordList);
+        board.playTiles(makePlay('HELLO', [4, 3], PlayDirection.Horizontal));
+        board.playTiles(makePlay('TEST', [2, 7], PlayDirection.Vertical));
+        expect(board.getPreviousMove()).toEqual({
+          // TEST
+          isValid: true,
+          points: 11
+        });
+        board.undoMove();
+        expect(board.getPreviousMove()).toEqual({
+          //HELLO
+          isValid: true,
+          points: 10
+        });
+      });
+    });
+
     // Tests:
     // - Invalid moves should not be added to the play history
   });
