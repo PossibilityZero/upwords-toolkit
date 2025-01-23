@@ -334,6 +334,57 @@ describe('UpwordsGame', () => {
           expect(game.getTileBag().tileCount).toBe(93);
         });
       });
+
+      describe('Game History in Loaded Game', () => {
+        it('should be able to undo turns in a loaded game', () => {
+          const game = new UpwordsGame(testWordList, 2, true);
+          game.getTileBag().removeTiles({ H: 1, E: 3, L: 2, O: 1 });
+          game.getTiles(0).addTiles({ H: 1, E: 3, L: 2, O: 1 });
+          game.getTileBag().removeTiles({ W: 1, R: 2, L: 1, D: 2, X: 1 });
+          game.getTiles(1).addTiles({ W: 1, R: 2, L: 1, D: 2, X: 1 });
+          game.playMove(defaultStarterMove);
+          game.drawSpecificTiles(0, 'ABCDE');
+          game.playMove(defaultSecondMove);
+          game.drawSpecificTiles(1, 'FGHI');
+          const serialized = game.serialize();
+
+          game.loadGameFromSerialized(serialized);
+          expect(game.getScore(0)).toBe(10);
+          expect(game.getScore(1)).toBe(10);
+          expect(game.currentPlayer).toBe(0);
+          expect(game.getTileBag().tileCount).toBe(77);
+          game.undoTurn();
+          expect(game.getScore(0)).toBe(10);
+          expect(game.getScore(1)).toBe(0);
+          game.undoTurn();
+          expect(game.getUBF()).toEqual(new UpwordsGame(testWordList).getUBF());
+        });
+
+        it('should not be affected by the game state before loading', () => {
+          const game = new UpwordsGame(testWordList, 2, true);
+          game.getTileBag().removeTiles({ H: 1, E: 3, L: 2, O: 1 });
+          game.getTiles(0).addTiles({ H: 1, E: 3, L: 2, O: 1 });
+          game.getTileBag().removeTiles({ W: 1, R: 2, L: 1, D: 2, X: 1 });
+          game.getTiles(1).addTiles({ W: 1, R: 2, L: 1, D: 2, X: 1 });
+          game.playMove(defaultStarterMove);
+          game.drawSpecificTiles(0, 'ABCDE');
+          const serialized = game.serialize();
+          game.playMove(defaultSecondMove);
+          game.drawSpecificTiles(1, 'FGHI');
+          game.skipTurn();
+
+          game.loadGameFromSerialized(serialized);
+          expect(game.getScore(0)).toBe(10);
+          expect(game.getScore(1)).toBe(0);
+          expect(game.currentPlayer).toBe(1);
+          expect(game.getTileBag().tileCount).toBe(81);
+          game.undoTurn();
+          expect(game.getScore(0)).toBe(0);
+          expect(game.getScore(1)).toBe(0);
+          expect(game.getTileBag().tileCount).toBe(86);
+          expect(game.getUBF()).toEqual(new UpwordsGame(testWordList).getUBF());
+        });
+      });
     });
 
     describe('Score', () => {

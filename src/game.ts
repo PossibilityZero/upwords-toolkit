@@ -205,13 +205,20 @@ class UpwordsGame {
       players: this.#players.map((player) => ({
         tilesString: player.tiles.listTiles(),
         score: player.score
-      }))
+      })),
+      turnHistory: this.#turnHistory
     });
   }
 
   loadGameFromSerialized(serialized: string): void {
     const gameData = JSON.parse(serialized);
-    this.#board = new UpwordsBoard(this.#wordList, gameData.ubf);
+    this.#board = new UpwordsBoard(this.#wordList);
+    for (const turn of gameData.turnHistory) {
+      if (turn.play) {
+        this.#board.playTiles(turn.play);
+      }
+    }
+    this.#turnHistory = gameData.turnHistory;
     this.#tileBag.deleteAllTiles();
     this.#tileBag.setTiles(TileSet.tilesFromString(gameData.tileBagString));
     this.#manualTiles = gameData.manualTiles;
