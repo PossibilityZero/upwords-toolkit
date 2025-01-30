@@ -102,7 +102,10 @@ class TileSet {
   static tilesFromString(tiles: string): Tiles {
     const tileCounts: Tiles = {};
     for (const tile of tiles.toUpperCase()) {
-      if (tile !== ' ') tileCounts[tile as Letter] = (tileCounts[tile as Letter] || 0) + 1;
+      const tileUppercase = tile.toUpperCase();
+      if (tileUppercase in defaultTileCounts) {
+        tileCounts[tileUppercase as Letter] = (tileCounts[tileUppercase as Letter] || 0) + 1;
+      }
     }
     return tileCounts;
   }

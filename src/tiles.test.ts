@@ -116,8 +116,12 @@ describe('TileSet', () => {
       expect(TileSet.tilesFromString('HELLO')).toEqual({ H: 1, E: 1, L: 2, O: 1 });
     });
 
-    it('should not count spaces', () => {
-      expect(TileSet.tilesFromString('W RLD')).toEqual({ W: 1, R: 1, L: 1, D: 1 });
+    it('should only count alphabet characters', () => {
+      expect(TileSet.tilesFromString('W RLD1')).toEqual({ W: 1, R: 1, L: 1, D: 1 });
+    });
+
+    it('should ignore case', () => {
+      expect(TileSet.tilesFromString('hello')).toEqual({ H: 1, E: 1, L: 2, O: 1 });
     });
   });
 });
