@@ -31,10 +31,10 @@ describe('UpwordsGame', () => {
       expect(newGame.playerCount).toBe(1);
     });
 
-    it('should default to automatically drawing tiles', () => {
+    it('should default to manually drawing tiles', () => {
       const newGame = new UpwordsGame(testWordList, 2);
-      expect(newGame.getTiles(0).tileCount).toBe(7);
-      expect(newGame.getTiles(1).tileCount).toBe(7);
+      expect(newGame.getTiles(0).tileCount).toBe(0);
+      expect(newGame.getTiles(1).tileCount).toBe(0);
     });
   });
 
@@ -67,8 +67,8 @@ describe('UpwordsGame', () => {
       expect(game.getScore(0)).toBe(10);
     });
 
-    it('should draw tiles to replenish the player rack after a move', () => {
-      const game = new UpwordsGame(testWordList, 1);
+    it('should draw tiles to replenish the player rack after a move if manual tiles is false', () => {
+      const game = new UpwordsGame(testWordList, 1, false);
       // return all tiles to the bag and manually set it up with letters for "HELLO"
       // this is necessary because we want to test the automatic drawing behavior,
       // but that option also makes the initial draw random
@@ -201,6 +201,17 @@ describe('UpwordsGame', () => {
         const result = game.returnSpecificTiles(0, 'HELLO');
         expect(result).toBeFalsy();
         expect(game.getTiles(0).tileCount).toBe(4);
+      });
+    });
+
+    describe('drawRandomTiles', () => {
+      it('should draw random tiles for the specified player to replenish their rack', () => {
+        const game = new UpwordsGame(testWordList, 2, true);
+        expect(game.getTiles(0).tileCount).toBe(0);
+        expect(game.getTiles(1).tileCount).toBe(0);
+        game.drawRandomTiles(0);
+        expect(game.getTiles(0).tileCount).toBe(7);
+        expect(game.getTiles(1).tileCount).toBe(0);
       });
     });
   });

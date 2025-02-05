@@ -21,7 +21,7 @@ class UpwordsGame {
     tileBagState: string;
   }[] = [];
 
-  constructor(wordList: string[], playerCount = 1, manualTiles = false) {
+  constructor(wordList: string[], playerCount = 1, manualTiles = true) {
     this.#manualTiles = manualTiles;
     this.#playerCount = playerCount;
     this.#currentPlayer = 0;
@@ -35,6 +35,7 @@ class UpwordsGame {
       this.#players.push(newPlayer);
     }
     this.#board = new UpwordsBoard(this.#wordList);
+    this.#turnHistory = [];
   }
 
   get currentPlayer(): number {
@@ -156,6 +157,18 @@ class UpwordsGame {
     }
   }
 
+  drawRandomTiles(playerId: number): void {
+    const player = this.#players[playerId];
+    if (!player) {
+      return;
+    }
+    if (this.#turnHistory.length <= playerId) {
+      this.#drawIntoRack(player, true);
+    } else {
+      this.#drawIntoRack(player);
+    }
+  }
+
   #drawIntoRack(player: Player, firstDraw = false): void {
     if (firstDraw) {
       player.tiles.addTiles(this.#tileBag.drawRandomConsonant());
@@ -172,7 +185,6 @@ class UpwordsGame {
   }
 
   getBoard(): UpwordsBoard {
-    // TODO: Fix this method, side effect of messing up UpwordsBoard trie
     // Return a copy of the game board
     return new UpwordsBoard(this.#wordList, this.#board.getUBF());
   }
