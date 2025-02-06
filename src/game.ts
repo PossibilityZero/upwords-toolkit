@@ -109,6 +109,14 @@ class UpwordsGame {
     this.#recordTileState();
   }
 
+  get automaticDraw(): boolean {
+    return !this.#manualTiles;
+  }
+
+  set automaticDraw(value: boolean) {
+    this.#manualTiles = !value;
+  }
+
   get currentPlayer(): number {
     return this.#currentPlayer;
   }

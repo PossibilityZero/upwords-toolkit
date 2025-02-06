@@ -169,6 +169,27 @@ describe('UpwordsGame', () => {
       expect(game.getTileBag().tileCount).toBe(95);
     });
 
+    describe('automaticDraw', () => {
+      it('should equal false if manual tiles is true', () => {
+        const game = new UpwordsGame(testWordList, 1, true);
+        expect(game.automaticDraw).toBe(false);
+        const game2 = new UpwordsGame(testWordList, 1, false);
+        expect(game2.automaticDraw).toBe(true);
+      });
+
+      it('should be settable and change the behavior of drawing tiles', () => {
+        const game = new UpwordsGame(testWordList, 2, true);
+        game.drawSpecificTiles(0, 'HELLO');
+        expect(game.getTiles(0).tileCount).toBe(5);
+        game.playMove(defaultStarterMove);
+        expect(game.getTiles(0).tileCount).toBe(0);
+        game.drawSpecificTiles(1, 'WRLD');
+        game.automaticDraw = true;
+        game.playMove(defaultSecondMove);
+        expect(game.getTiles(1).tileCount).toBe(7);
+      });
+    });
+
     describe('drawSpecificTiles', () => {
       it('should draw the specified tiles for the specified player', () => {
         const game = new UpwordsGame(testWordList, 2, true);
