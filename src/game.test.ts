@@ -275,6 +275,23 @@ describe('UpwordsGame', () => {
         expect(game.getTileBag().getTiles()).toEqual({ H: 1, E: 1, L: 2, O: 1 });
       });
     });
+
+    describe('Undoing Turns with Reserved Tiles', () => {
+      it('should restore the reserved tile state when undoing a turn', () => {
+        const game = new UpwordsGame(testWordList, 1);
+        game.setAsideTiles('JQXZ');
+        game.drawSpecificTiles(0, 'HELLO');
+        expect(game.getReservedTiles().tileCount).toBe(4);
+        expect(game.getTileBag().tileCount).toBe(91);
+        game.playMove(defaultStarterMove);
+        game.returnAllReservedTiles();
+        expect(game.getReservedTiles().tileCount).toBe(0);
+        expect(game.getTileBag().tileCount).toBe(95);
+        game.undoTurn();
+        expect(game.getReservedTiles().tileCount).toBe(4);
+        expect(game.getTileBag().tileCount).toBe(91);
+      });
+    });
   });
 
   describe('checkMove', () => {
@@ -366,20 +383,21 @@ describe('UpwordsGame', () => {
       describe('newGameFromSerialized', () => {
         it('should create a new game from a string representation', () => {
           const game = new UpwordsGame(testWordList, 2, true);
-          game.getTileBag().removeTiles({ H: 1, E: 3, L: 2, O: 1 });
-          game.getTiles(0).addTiles({ H: 1, E: 3, L: 2, O: 1 });
           game.getTileBag().removeTiles({ W: 1, R: 2, L: 1, D: 2, X: 1 });
-          game.getTiles(1).addTiles({ W: 1, R: 2, L: 1, D: 2, X: 1 });
+          game.getTiles(0).addTiles({ W: 1, R: 2, L: 1, D: 2, X: 1 });
+          game.skipTurn();
+          game.getTileBag().removeTiles({ H: 1, E: 3, L: 2, O: 1 });
+          game.getTiles(1).addTiles({ H: 1, E: 3, L: 2, O: 1 });
           game.playMove(defaultStarterMove);
           const serialized = game.serialize();
 
           game.playMove(defaultSecondMove);
           const loadedGame = UpwordsGame.newGameFromSerialized(testWordList, serialized);
-          expect(loadedGame.getScore(0)).toBe(10);
-          expect(loadedGame.getScore(1)).toBe(0);
-          expect(loadedGame.currentPlayer).toBe(1);
-          expect(loadedGame.getTiles(0).tileCount).toBe(2);
-          expect(loadedGame.getTiles(1).tileCount).toBe(7);
+          expect(loadedGame.getScore(0)).toBe(0);
+          expect(loadedGame.getScore(1)).toBe(10);
+          expect(loadedGame.currentPlayer).toBe(0);
+          expect(loadedGame.getTiles(0).tileCount).toBe(7);
+          expect(loadedGame.getTiles(1).tileCount).toBe(2);
           expect(loadedGame.getTileBag().tileCount).toBe(86);
         });
       });

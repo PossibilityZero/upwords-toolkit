@@ -2,9 +2,50 @@ import { UpwordsBoard, UpwordsPlay, IUpwordsBoardFormat, IMoveResult } from './b
 import { TileSet, TileRack, TileBag } from './tiles.js';
 
 type Player = {
+  id: number;
   tiles: TileRack;
   score: number;
 };
+
+type PlayRecord = {
+  type: 'play';
+  play: UpwordsPlay;
+  playerId: number;
+  points: number;
+};
+
+type SkipRecord = {
+  type: 'skip';
+  playerId: number;
+};
+
+type TileStateRecord = {
+  type: 'tileState';
+  tileBag: string;
+  reservedTiles: string;
+  racks: { playerId: number; tiles: string }[];
+};
+
+function makePlayRecord(play: UpwordsPlay, playerId: number, points: number): PlayRecord {
+  return { type: 'play', play, playerId, points };
+}
+
+function makeSkipRecord(playerId: number): SkipRecord {
+  return { type: 'skip', playerId };
+}
+
+function makeTileStateRecord(
+  tileBag: TileBag,
+  reservedTiles: TileSet,
+  players: Player[]
+): TileStateRecord {
+  return {
+    type: 'tileState',
+    tileBag: tileBag.listTiles(),
+    reservedTiles: reservedTiles.listTiles(),
+    racks: players.map((player) => ({ playerId: player.id, tiles: player.tiles.listTiles() }))
+  };
+}
 
 class UpwordsGame {
   #playerCount: number;
@@ -15,29 +56,38 @@ class UpwordsGame {
   #tileBag: TileBag;
   #reservedTiles: TileSet;
   #players: Player[] = [];
-  #turnHistory: {
-    play: UpwordsPlay | null;
-    points: number;
-    playerTilesState: string[];
-    tileBagState: string;
-  }[] = [];
+  #gameHistory: (PlayRecord | SkipRecord | TileStateRecord)[] = [];
 
   constructor(wordList: string[], playerCount = 1, manualTiles = true) {
-    this.#manualTiles = manualTiles;
-    this.#playerCount = playerCount;
-    this.#currentPlayer = 0;
     this.#wordList = wordList;
+    this.#playerCount = playerCount;
+    this.#manualTiles = manualTiles;
+    this.#currentPlayer = 0;
+    this.#board = new UpwordsBoard(this.#wordList);
     this.#tileBag = new TileBag();
     this.#reservedTiles = new TileSet();
     for (let i = 0; i < playerCount; i++) {
-      const newPlayer = { tiles: new TileRack(), score: 0 };
-      if (!this.#manualTiles) {
-        this.#drawIntoRack(newPlayer, true);
-      }
+      const newPlayer = { id: i, tiles: new TileRack(), score: 0 };
       this.#players.push(newPlayer);
     }
+    this.#players.forEach((player) => {
+      if (!this.#manualTiles) {
+        this.#drawIntoRack(player, true);
+      }
+    });
+    this.#recordTileState();
+  }
+
+  #resetGame(): void {
+    this.#currentPlayer = 0;
     this.#board = new UpwordsBoard(this.#wordList);
-    this.#turnHistory = [];
+    this.#tileBag = new TileBag();
+    this.#reservedTiles = new TileSet();
+    for (let i = 0; i < this.#playerCount; i++) {
+      const newPlayer = { id: i, tiles: new TileRack(), score: 0 };
+      this.#players[i] = newPlayer;
+    }
+    this.#gameHistory = [];
   }
 
   get currentPlayer(): number {
@@ -48,6 +98,14 @@ class UpwordsGame {
     return this.#playerCount;
   }
 
+  #cycleToNextPlayer(): void {
+    this.#currentPlayer = (this.#currentPlayer + 1) % this.#playerCount;
+  }
+
+  #cycleToPrevPlayer(): void {
+    this.#currentPlayer = (this.#currentPlayer - 1 + this.#playerCount) % this.#playerCount;
+  }
+
   isFinished(): boolean {
     return (
       this.#tileBag.tileCount === 0 && this.#players.some((player) => player.tiles.tileCount === 0)
@@ -55,6 +113,7 @@ class UpwordsGame {
   }
 
   playMove(play: UpwordsPlay): void {
+    this.#recordTileState();
     const player = this.#players[this.#currentPlayer];
     if (!player) {
       throw new Error('Player does not exist');
@@ -66,53 +125,46 @@ class UpwordsGame {
 
     const playResult = this.#board.playTiles(play);
     if (playResult.isValid) {
-      const playerTilesState = this.#players.map((player) => player.tiles.listTiles());
-      const tileBagState = this.#tileBag.listTiles();
+      const points = playResult.points || 0;
+      this.#gameHistory.push(makePlayRecord(play, this.#currentPlayer, points));
       player.tiles.removeTiles(tiles);
       player.score += playResult.points!;
       if (!this.#manualTiles) {
         this.#drawIntoRack(player);
       }
-      // Cycle to the next player
-      this.#currentPlayer = (this.#currentPlayer + 1) % this.#playerCount;
-      this.#turnHistory.push({
-        play,
-        points: playResult.points || 0,
-        playerTilesState,
-        tileBagState
-      });
+      this.#cycleToNextPlayer();
     }
   }
 
   skipTurn(): void {
-    const playerTilesState = this.#players.map((player) => player.tiles.listTiles());
-    const tileBagState = this.#tileBag.listTiles();
-    this.#currentPlayer = (this.#currentPlayer + 1) % this.#playerCount;
-    this.#turnHistory.push({
-      play: null,
-      points: 0,
-      playerTilesState,
-      tileBagState
-    });
+    this.#recordTileState();
+    this.#gameHistory.push(makeSkipRecord(this.#currentPlayer));
+    this.#cycleToNextPlayer();
   }
 
   undoTurn(): void {
-    const lastPlay = this.#turnHistory.pop();
-    if (!lastPlay) {
-      return;
+    while (this.#gameHistory.length > 0) {
+      const gameRecord = this.#gameHistory.pop();
+      if (!gameRecord) {
+        break;
+      }
+      if (gameRecord.type === 'tileState') {
+        this.#restoreTileState(gameRecord);
+      } else {
+        if (gameRecord.type === 'play') {
+          this.#players[gameRecord.playerId]!.score -= gameRecord.points;
+          this.#board.undoMove();
+        }
+        this.#cycleToPrevPlayer();
+        const prevStateRecord = this.#gameHistory.pop();
+        if (prevStateRecord?.type !== 'tileState') {
+          throw new Error('Invalid game history');
+        }
+        this.#restoreTileState(prevStateRecord);
+        break;
+      }
     }
-    this.#currentPlayer = (this.#currentPlayer - 1 + this.#playerCount) % this.#playerCount;
-    this.#players[this.#currentPlayer]!.score -= lastPlay.points;
-    this.#players.forEach((player, i) => {
-      const playerTiles = TileSet.tilesFromString(lastPlay.playerTilesState[i]!);
-      player.tiles.deleteAllTiles();
-      player.tiles.setTiles(playerTiles);
-    });
-    this.#tileBag.deleteAllTiles();
-    this.#tileBag.setTiles(TileSet.tilesFromString(lastPlay.tileBagState));
-    if (lastPlay.play) {
-      this.#board.undoMove();
-    }
+    this.#recordTileState();
   }
 
   checkMove(play: UpwordsPlay, boardStateOnly = false): IMoveResult {
@@ -164,11 +216,7 @@ class UpwordsGame {
     if (!player) {
       return;
     }
-    if (this.#turnHistory.length <= playerId) {
-      this.#drawIntoRack(player, true);
-    } else {
-      this.#drawIntoRack(player);
-    }
+    this.#drawIntoRack(player);
   }
 
   #drawIntoRack(player: Player, firstDraw = false): void {
@@ -238,41 +286,57 @@ class UpwordsGame {
     }
   }
 
+  #recordTileState(): void {
+    if (this.#gameHistory.slice(-1)[0]?.type === 'tileState') {
+      this.#gameHistory.pop();
+      this.#gameHistory.push(
+        makeTileStateRecord(this.#tileBag, this.#reservedTiles, this.#players)
+      );
+    } else {
+      this.#gameHistory.push(
+        makeTileStateRecord(this.#tileBag, this.#reservedTiles, this.#players)
+      );
+    }
+  }
+
   serialize(): string {
+    this.#recordTileState();
     return JSON.stringify({
-      ubf: this.getUBF(),
-      tileBagString: this.#tileBag.listTiles(),
+      version: 'v2.0',
       manualTiles: this.#manualTiles,
       playerCount: this.#playerCount,
-      currentPlayer: this.#currentPlayer,
-      players: this.#players.map((player) => ({
-        tilesString: player.tiles.listTiles(),
-        score: player.score
-      })),
-      turnHistory: this.#turnHistory
+      gameHistory: this.#gameHistory
     });
   }
 
   loadGameFromSerialized(serialized: string): void {
     const gameData = JSON.parse(serialized);
-    this.#board = new UpwordsBoard(this.#wordList);
-    for (const turn of gameData.turnHistory) {
-      if (turn.play) {
-        this.#board.playTiles(turn.play);
-      }
-    }
-    this.#turnHistory = gameData.turnHistory;
-    this.#tileBag.deleteAllTiles();
-    this.#tileBag.setTiles(TileSet.tilesFromString(gameData.tileBagString));
     this.#manualTiles = gameData.manualTiles;
     this.#playerCount = gameData.playerCount;
-    this.#currentPlayer = gameData.currentPlayer;
-    this.#players.length = 0;
-    gameData.players.forEach((player: { tilesString: string; score: number }) => {
-      const restoredPlayer = { tiles: new TileRack(), score: player.score };
-      restoredPlayer.tiles.setTiles(TileSet.tilesFromString(player.tilesString));
-      this.#players.push(restoredPlayer);
-    });
+    this.#resetGame();
+    for (const record of gameData.gameHistory) {
+      if (record.type === 'play') {
+        this.playMove(record.play);
+      } else if (record.type === 'skip') {
+        this.skipTurn();
+      } else if (record.type === 'tileState') {
+        this.#restoreTileState(record);
+      }
+    }
+  }
+
+  #restoreTileState(record: TileStateRecord): void {
+    this.#tileBag.deleteAllTiles();
+    this.#tileBag.setTiles(TileSet.tilesFromString(record.tileBag));
+    this.#reservedTiles.deleteAllTiles();
+    this.#reservedTiles.setTiles(TileSet.tilesFromString(record.reservedTiles));
+    for (const rack of record.racks) {
+      const playerRack = this.#players[rack.playerId]?.tiles;
+      if (playerRack) {
+        playerRack.deleteAllTiles();
+        playerRack.setTiles(TileSet.tilesFromString(rack.tiles));
+      }
+    }
   }
 
   static newGameFromSerialized(wordList: string[], serialized: string): UpwordsGame {
