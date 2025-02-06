@@ -13,6 +13,7 @@ class UpwordsGame {
   #manualTiles: boolean;
   #wordList: string[];
   #tileBag: TileBag;
+  #reservedTiles: TileSet;
   #players: Player[] = [];
   #turnHistory: {
     play: UpwordsPlay | null;
@@ -27,6 +28,7 @@ class UpwordsGame {
     this.#currentPlayer = 0;
     this.#wordList = wordList;
     this.#tileBag = new TileBag();
+    this.#reservedTiles = new TileSet();
     for (let i = 0; i < playerCount; i++) {
       const newPlayer = { tiles: new TileRack(), score: 0 };
       if (!this.#manualTiles) {
@@ -196,6 +198,35 @@ class UpwordsGame {
 
   getTileBag(): TileBag {
     return this.#tileBag;
+  }
+
+  setAsideTiles(tiles: string): boolean {
+    const transferedTiles = TileSet.tilesFromString(tiles);
+    if (this.#tileBag.hasTiles(transferedTiles)) {
+      this.#tileBag.removeTiles(transferedTiles);
+      this.#reservedTiles.addTiles(transferedTiles);
+      return true;
+    }
+    return false;
+  }
+
+  returnReservedTiles(tiles: string): boolean {
+    const transferedTiles = TileSet.tilesFromString(tiles);
+    if (this.#reservedTiles.hasTiles(transferedTiles)) {
+      this.#reservedTiles.removeTiles(transferedTiles);
+      this.#tileBag.addTiles(transferedTiles);
+      return true;
+    }
+    return false;
+  }
+
+  returnAllReservedTiles(): void {
+    this.#tileBag.addTiles(this.#reservedTiles.getTiles());
+    this.#reservedTiles.deleteAllTiles();
+  }
+
+  getReservedTiles(): TileSet {
+    return this.#reservedTiles;
   }
 
   getScore(player: number): number {

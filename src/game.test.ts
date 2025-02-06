@@ -216,6 +216,67 @@ describe('UpwordsGame', () => {
     });
   });
 
+  describe('Reserve Tiles', () => {
+    describe('setAsideTiles', () => {
+      it('should move the specified tiles from the tile bag to the reserved set', () => {
+        const game = new UpwordsGame(testWordList, 1);
+        expect(game.getTileBag().tileCount).toBe(100);
+        expect(game.getReservedTiles().tileCount).toBe(0);
+        game.setAsideTiles('HELLO');
+        expect(game.getTileBag().tileCount).toBe(95);
+        expect(game.getReservedTiles().getTiles()).toEqual({ H: 1, E: 1, L: 2, O: 1 });
+        expect(game.getReservedTiles().tileCount).toBe(5);
+      });
+
+      it('should return boolean for success/failure and only transfer on success', () => {
+        const game = new UpwordsGame(testWordList, 1);
+        expect(game.getTileBag().tileCount).toBe(100);
+        expect(game.setAsideTiles('XXX')).toBe(false); // more than count
+        expect(game.getTileBag().tileCount).toBe(100);
+        expect(game.setAsideTiles('HELLO')).toBe(true);
+        expect(game.getTileBag().tileCount).toBe(95);
+        game.getTileBag().deleteAllTiles();
+        expect(game.setAsideTiles('A')).toBe(false); // not in bag
+      });
+    });
+
+    describe('returnReservedTiles', () => {
+      it('should move the specified tiles from the reserved set to the tile bag', () => {
+        const game = new UpwordsGame(testWordList, 1);
+        game.setAsideTiles('HELLO');
+        expect(game.getTileBag().tileCount).toBe(95);
+        expect(game.getReservedTiles().tileCount).toBe(5);
+        game.returnReservedTiles('LOL');
+        expect(game.getTileBag().tileCount).toBe(98);
+        expect(game.getReservedTiles().getTiles()).toEqual({ H: 1, E: 1 });
+        expect(game.getReservedTiles().tileCount).toBe(2);
+      });
+
+      it('should return boolean for success/failure and only transfer on success', () => {
+        const game = new UpwordsGame(testWordList, 1);
+        game.setAsideTiles('HELLO');
+        expect(game.returnReservedTiles('LLO')).toBe(true);
+        expect(game.getReservedTiles().tileCount).toBe(2);
+        expect(game.returnReservedTiles('LLO')).toBe(false);
+        expect(game.getReservedTiles().tileCount).toBe(2);
+      });
+    });
+
+    describe('returnAllReservedTiles', () => {
+      it('should move all reserved tiles to the tile bag', () => {
+        const game = new UpwordsGame(testWordList, 1);
+        game.setAsideTiles('HELLO');
+        game.getTileBag().deleteAllTiles();
+        expect(game.getTileBag().tileCount).toBe(0);
+        expect(game.getReservedTiles().tileCount).toBe(5);
+        game.returnAllReservedTiles();
+        expect(game.getTileBag().tileCount).toBe(5);
+        expect(game.getReservedTiles().tileCount).toBe(0);
+        expect(game.getTileBag().getTiles()).toEqual({ H: 1, E: 1, L: 2, O: 1 });
+      });
+    });
+  });
+
   describe('checkMove', () => {
     it('should return the play result if the play is valid', () => {
       const game = new UpwordsGame(testWordList, 1, true);
