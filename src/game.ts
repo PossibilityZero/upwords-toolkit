@@ -47,6 +47,24 @@ function makeTileStateRecord(
   };
 }
 
+/**
+ * Transfer tiles between two sets
+ *
+ * @param from - The set to transfer tiles from
+ * @param to - The set to transfer tiles to
+ * @param letters - The letters to transfer
+ * @returns Whether the transfer was successful
+ */
+function transferTilesBetweenSets(from: TileSet, to: TileSet, letters: string): boolean {
+  const transferedTiles = TileSet.tilesFromString(letters);
+  if (from.hasTiles(transferedTiles)) {
+    from.removeTiles(transferedTiles);
+    to.addTiles(transferedTiles);
+    return true;
+  }
+  return false;
+}
+
 class UpwordsGame {
   #playerCount: number;
   #currentPlayer: number;
@@ -88,6 +106,7 @@ class UpwordsGame {
       this.#players[i] = newPlayer;
     }
     this.#gameHistory = [];
+    this.#recordTileState();
   }
 
   get currentPlayer(): number {
@@ -184,15 +203,7 @@ class UpwordsGame {
     if (!player) {
       return false;
     }
-    const playerTiles = player.tiles;
-    const tileSet = TileSet.tilesFromString(tiles);
-    if (this.#tileBag.hasTiles(tileSet)) {
-      this.#tileBag.removeTiles(tileSet);
-      playerTiles.addTiles(tileSet);
-      return true;
-    } else {
-      return false;
-    }
+    return transferTilesBetweenSets(this.#tileBag, player.tiles, tiles);
   }
 
   returnSpecificTiles(playerId: number, tiles: string): boolean {
@@ -200,15 +211,7 @@ class UpwordsGame {
     if (!player) {
       return false;
     }
-    const playerTiles = player.tiles;
-    const tileSet = TileSet.tilesFromString(tiles);
-    if (playerTiles.hasTiles(tileSet)) {
-      playerTiles.removeTiles(tileSet);
-      this.#tileBag.addTiles(tileSet);
-      return true;
-    } else {
-      return false;
-    }
+    return transferTilesBetweenSets(player.tiles, this.#tileBag, tiles);
   }
 
   drawRandomTiles(playerId: number): void {
@@ -248,24 +251,12 @@ class UpwordsGame {
     return this.#tileBag;
   }
 
-  setAsideTiles(tiles: string): boolean {
-    const transferedTiles = TileSet.tilesFromString(tiles);
-    if (this.#tileBag.hasTiles(transferedTiles)) {
-      this.#tileBag.removeTiles(transferedTiles);
-      this.#reservedTiles.addTiles(transferedTiles);
-      return true;
-    }
-    return false;
+  setAsideTiles(letters: string): boolean {
+    return transferTilesBetweenSets(this.#tileBag, this.#reservedTiles, letters);
   }
 
-  returnReservedTiles(tiles: string): boolean {
-    const transferedTiles = TileSet.tilesFromString(tiles);
-    if (this.#reservedTiles.hasTiles(transferedTiles)) {
-      this.#reservedTiles.removeTiles(transferedTiles);
-      this.#tileBag.addTiles(transferedTiles);
-      return true;
-    }
-    return false;
+  returnReservedTiles(letters: string): boolean {
+    return transferTilesBetweenSets(this.#reservedTiles, this.#tileBag, letters);
   }
 
   returnAllReservedTiles(): void {
@@ -299,6 +290,20 @@ class UpwordsGame {
     }
   }
 
+  #restoreTileState(record: TileStateRecord): void {
+    this.#tileBag.deleteAllTiles();
+    this.#tileBag.setTiles(TileSet.tilesFromString(record.tileBag));
+    this.#reservedTiles.deleteAllTiles();
+    this.#reservedTiles.setTiles(TileSet.tilesFromString(record.reservedTiles));
+    for (const rack of record.racks) {
+      const playerRack = this.#players[rack.playerId]?.tiles;
+      if (playerRack) {
+        playerRack.deleteAllTiles();
+        playerRack.setTiles(TileSet.tilesFromString(rack.tiles));
+      }
+    }
+  }
+
   serialize(): string {
     this.#recordTileState();
     return JSON.stringify({
@@ -321,20 +326,6 @@ class UpwordsGame {
         this.skipTurn();
       } else if (record.type === 'tileState') {
         this.#restoreTileState(record);
-      }
-    }
-  }
-
-  #restoreTileState(record: TileStateRecord): void {
-    this.#tileBag.deleteAllTiles();
-    this.#tileBag.setTiles(TileSet.tilesFromString(record.tileBag));
-    this.#reservedTiles.deleteAllTiles();
-    this.#reservedTiles.setTiles(TileSet.tilesFromString(record.reservedTiles));
-    for (const rack of record.racks) {
-      const playerRack = this.#players[rack.playerId]?.tiles;
-      if (playerRack) {
-        playerRack.deleteAllTiles();
-        playerRack.setTiles(TileSet.tilesFromString(rack.tiles));
       }
     }
   }
