@@ -222,20 +222,26 @@ class UpwordsGame {
     return transferTilesBetweenSets(player.tiles, this.#tileBag, tiles);
   }
 
-  drawRandomTiles(playerId: number): void {
+  drawRandomTiles(playerId: number, limit: number = 0): void {
     const player = this.#players[playerId];
     if (!player) {
       return;
     }
-    this.#drawIntoRack(player);
+    this.#drawIntoRack(player, false, limit);
   }
 
-  #drawIntoRack(player: Player, firstDraw = false): void {
+  #drawIntoRack(player: Player, firstDraw = false, limit: number = 0): void {
     if (firstDraw) {
       player.tiles.addTiles(this.#tileBag.drawRandomConsonant());
       player.tiles.addTiles(this.#tileBag.drawRandomVowel());
     }
-    while (player.tiles.getMissingTiles() > 0 && this.#tileBag.tileCount > 0) {
+    let drawCount;
+    if (limit === 0) {
+      drawCount = player.tiles.getMissingTiles();
+    } else {
+      drawCount = Math.min(limit, player.tiles.getMissingTiles());
+    }
+    while (drawCount-- > 0 && this.#tileBag.tileCount > 0) {
       player.tiles.addTiles(this.#tileBag.drawRandomTile());
     }
   }

@@ -234,6 +234,17 @@ describe('UpwordsGame', () => {
         expect(game.getTiles(0).tileCount).toBe(7);
         expect(game.getTiles(1).tileCount).toBe(0);
       });
+
+      it('should take a parameter to limit the number of tiles drawn', () => {
+        const game = new UpwordsGame(testWordList, 2, true);
+        game.drawRandomTiles(0, 2);
+        expect(game.getTiles(0).tileCount).toBe(2);
+        game.drawRandomTiles(0, 1);
+        expect(game.getTiles(0).tileCount).toBe(3);
+        // should not draw over rack target
+        game.drawRandomTiles(0, 5);
+        expect(game.getTiles(0).tileCount).toBe(7);
+      });
     });
   });
 
