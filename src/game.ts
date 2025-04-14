@@ -101,6 +101,7 @@ class UpwordsGame {
     this.#board = new UpwordsBoard(this.#wordList);
     this.#tileBag = new TileBag();
     this.#reservedTiles = new TileSet();
+    this.#players.length = 0;
     for (let i = 0; i < this.#playerCount; i++) {
       const newPlayer = { id: i, tiles: new TileRack(), score: 0 };
       this.#players[i] = newPlayer;
@@ -330,7 +331,7 @@ class UpwordsGame {
 
   loadGameFromSerialized(serialized: string): void {
     const gameData = JSON.parse(serialized);
-    this.#manualTiles = gameData.manualTiles;
+    this.#manualTiles = true;
     this.#playerCount = gameData.playerCount;
     this.#resetGame();
     for (const record of gameData.gameHistory) {
@@ -342,6 +343,7 @@ class UpwordsGame {
         this.#restoreTileState(record);
       }
     }
+    this.#manualTiles = gameData.manualTiles;
   }
 
   static newGameFromSerialized(wordList: string[], serialized: string): UpwordsGame {

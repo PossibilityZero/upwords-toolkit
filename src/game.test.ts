@@ -455,6 +455,20 @@ describe('UpwordsGame', () => {
           expect(game.getTiles(1).tileCount).toBe(0);
           expect(game.getTileBag().tileCount).toBe(93);
         });
+
+        it('should correctly load games with different player count', () => {
+          // this test added to address bug which occurred in the game player
+          // when loading a game from 2 players, the 1 player game would be counted as "finished" due to
+          // a phantom second player
+          const savedGame = new UpwordsGame(testWordList, 1, false);
+          const serialized = savedGame.serialize();
+          const game = new UpwordsGame(testWordList, 2, true);
+          game.loadGameFromSerialized(serialized);
+          game.drawRandomTiles(0, 1);
+          game.getTileBag().deleteAllTiles();
+          expect(game.playerCount).toBe(1);
+          expect(game.isFinished()).toBe(false);
+        });
       });
 
       describe('Game History in Loaded Game', () => {
